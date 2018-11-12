@@ -6,6 +6,7 @@ npm-debug.log
 .DS_Store
 .idea/*
 public/data/*
+data-processing/result/*.json
 
 # Logs
 logs
