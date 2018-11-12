@@ -1,0 +1,34 @@
+* {
+  box-sizing: border-box; }
+
+html {
+  background: #fff;
+  width: 100%;
+  height: 100%; }
+
+#app {
+  width: 1920px;
+  height: 1080px;
+  background: #eee;
+  padding: 12px;
+  margin: auto; }
+  #app .section {
+    width: 100%;
+    background: #fff;
+    align-content: center; }
+    #app .section.model-ranking-view {
+      height: 244px;
+      margin-bottom: 6px; }
+    #app .section.model-diagnosis-view {
+      height: calc(100% - 250px - 6px);
+      margin-top: 6px; }
+
+svg#model-ranking-vis {
+  width: 100%;
+  height: 100%; }
+
+svg#model-diagnosis-vis {
+  width: 100%;
+  height: 100%; }
+
+/*# sourceMappingURL=style.css.map */
