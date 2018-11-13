@@ -8,14 +8,15 @@ const DATA = new function () {
             const file_dir = '../data/result/' + model_name + '.json';
             that.MODELS_PREDICTION[model_name] = await $.getJSON(file_dir);
         }
-
-        Util.MODEL_RANKING_VIS = modelRankingVis();
+        Components.MODEL_RANKING_VIS = modelRankingVis();
+        Components.MODEL_DIAGNOSIS_VIS = modelDiagnosisVis();
     };
 };
 
 DATA.load();
 
-const Util = new function () {
-    this.MODEL_RANKING_VIS = null;
+const Components = new function () {
+    this.MODEL_RANKING_VIS = {};
+    this.MODEL_DIAGNOSIS_VIS = {};
     return this;
 };

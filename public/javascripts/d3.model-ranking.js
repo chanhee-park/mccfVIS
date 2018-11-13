@@ -1,23 +1,24 @@
 function modelRankingVis() {
-
     let that = this;
 
     const root = d3.select('#model-ranking-vis');
 
     const WIDTH = 1896;
-    const HEIGHT = 243;
+    const HEIGHT = 213;
 
-    const MARGIN_TOP = 50;
+    const MARGIN_TOP = 30;
     const RANKING_VIS_HEIGHT = HEIGHT - MARGIN_TOP;
     const CELL_HEIGHT = RANKING_VIS_HEIGHT / (CONSTANT.MODEL_NAMES.length);
     const BAR_HEIGHT = CELL_HEIGHT * 0.5;
     const BAR_MARGIN_TOP = CELL_HEIGHT * 0.2;
 
-    const MARGIN_LEFT = 250;
+    const MARGIN_LEFT = CONSTANT.MARGIN_LEFT;
     const RANKING_VIS_WIDTH = WIDTH - MARGIN_LEFT;
     const CELL_WIDTH = RANKING_VIS_WIDTH / 10;
     const RANKING_CHANGE_LINE_LEN = 30;
     const BAR_WIDTH = CELL_WIDTH - RANKING_CHANGE_LINE_LEN;
+
+    const TEXT_X_END = 175;
 
     let models_performance = Processor.getPerformances(CONSTANT.MODEL_NAMES);
 
@@ -29,7 +30,7 @@ function modelRankingVis() {
         draw(ranking_info);
     };
 
-    const ranking_info = getRankingInfo('true');
+    const ranking_info = getRankingInfo('model_name');
     draw(ranking_info);
 
     function draw(ranking_info) {
@@ -54,16 +55,20 @@ function modelRankingVis() {
             const model_performance = models_performance[model_name];
 
             // 각각의 클래스를 순회하며 그린다.
+            const spark_line_y = [];
+            let spark_y_base = 0;
+            const ranking_line = [];
             _.forEach(model_performance, (performance_by_class, digit) => {
                 digit = parseInt(digit);
                 const ranking = ranking_info[digit].indexOf(model_name);
-
+                spark_line_y.push(performance_by_class['true']);
                 // 모델 이름을 적는다.
                 if (digit === 0) {
+                    spark_y_base = MARGIN_TOP + ((ranking + 1) * CELL_HEIGHT);
                     root.append('text')
                         .text(model_name)
                         .attrs({
-                            x: 150,
+                            x: TEXT_X_END,
                             y: MARGIN_TOP + (ranking * CELL_HEIGHT) + (CELL_HEIGHT / 2),
                             'text-anchor': 'end',
                             'alignment-baseline': 'central',
@@ -72,12 +77,13 @@ function modelRankingVis() {
                         })
                         .classed('model-name', true)
                         .on("mouseover", function () {
-                            d3.selectAll('.cell-background' + '.' + model_name).style("fill", CONSTANT.COLORS[model_name]);
-                            d3.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", CELL_HEIGHT);
+                            mouseOn(model_name);
                         })
                         .on("mouseout", function () {
-                            d3.selectAll('.cell-background' + '.' + model_name).style("fill", "#fff");
-                            d3.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", "3px");
+                            mouseOut(model_name);
+                        })
+                        .on("mousedown", function () {
+                            mouseDown(model_name);
                         });
 
                     // 셀은 흰색 배경을 가진다.
@@ -88,10 +94,18 @@ function modelRankingVis() {
                             width: MARGIN_LEFT,
                             height: CELL_HEIGHT,
                             fill: '#fff',
-                            'z-index': -1
                         })
                         .classed('cell-background', true)
-                        .classed(model_name, true);
+                        .classed(model_name, true)
+                        .on("mouseover", function () {
+                            mouseOn(model_name);
+                        })
+                        .on("mouseout", function () {
+                            mouseOut(model_name);
+                        })
+                        .on("mousedown", function () {
+                            mouseDown(model_name);
+                        });
                 }
 
                 // 셀은 흰색 배경을 가진다.
@@ -102,26 +116,39 @@ function modelRankingVis() {
                         width: BAR_WIDTH + 10,
                         height: CELL_HEIGHT,
                         fill: '#fff',
-                        'z-index': -1
                     })
                     .classed('cell-background', true)
-                    .classed(model_name, true);
+                    .classed(model_name, true)
+                    .on("mouseover", function () {
+                        mouseOn(model_name);
+                    })
+                    .on("mouseout", function () {
+                        mouseOut(model_name);
+                    })
+                    .on("mousedown", function () {
+                        mouseDown(model_name);
+                    });
 
                 // 순위 변경선을 그린다.
                 if (digit !== 9) {
                     const next_digit = digit + 1;
                     const next_ranking = ranking_info[next_digit].indexOf(model_name);
-                    root.append('line')
-                        .attrs({
-                            x1: MARGIN_LEFT + (digit * CELL_WIDTH) + BAR_WIDTH - 10,
-                            x2: MARGIN_LEFT + (next_digit * CELL_WIDTH) + 10,
-                            y1: MARGIN_TOP + (ranking * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP,
-                            y2: MARGIN_TOP + (next_ranking * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP,
-                            stroke: CONSTANT.COLORS[model_name],
-                            'stroke-width': '3px',
-                        })
-                        .classed('ranking-change-line', true)
-                        .classed(model_name, true);
+                    ranking_line.push({
+                        x: MARGIN_LEFT + (digit * CELL_WIDTH) + BAR_WIDTH - 10,
+                        y: MARGIN_TOP + (ranking * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP
+                    });
+                    ranking_line.push({
+                        x: MARGIN_LEFT + (digit * CELL_WIDTH) + BAR_WIDTH,
+                        y: MARGIN_TOP + (ranking * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP
+                    });
+                    ranking_line.push({
+                        x: MARGIN_LEFT + (next_digit * CELL_WIDTH),
+                        y: MARGIN_TOP + (next_ranking * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP
+                    });
+                    ranking_line.push({
+                        x: MARGIN_LEFT + (next_digit * CELL_WIDTH) + 10,
+                        y: MARGIN_TOP + (next_ranking * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP
+                    });
                 }
 
                 // 바를 그린다.
@@ -134,10 +161,24 @@ function modelRankingVis() {
                         height: BAR_HEIGHT + 4,
                         fill: '#777',
                     })
-                    .classed('performance-bar-stroke', true);
+                    .classed('performance-bar-stroke', true)
+                    .on("mouseover", function () {
+                        mouseOn(model_name);
+                    })
+                    .on("mouseout", function () {
+                        mouseOut(model_name);
+                    })
+                    .on("mousedown", function () {
+                        mouseDown(model_name);
+                    });
+
                 // < 맞음, 틀림, 개선, 악화> 등에 맞춰 각각의 비율을 그린다.
                 let pre_ratio = 0;
+
                 _.forEach(performance_by_class, (ratio_val, ratio_name) => {
+                    if (pre_ratio >= 0.999) {
+                        ratio_val = 0;
+                    }
                     root.append('rect')
                         .attrs({
                             x: MARGIN_LEFT + (digit * CELL_WIDTH) + (pre_ratio * BAR_WIDTH),
@@ -146,17 +187,97 @@ function modelRankingVis() {
                             height: BAR_HEIGHT,
                             fill: CONSTANT.COLORS[ratio_name],
                         })
-                        .classed('performance-bar', true);
+                        .classed('performance-bar', true)
+                        .on("mouseover", function () {
+                            mouseOn(model_name);
+                        })
+                        .on("mouseout", function () {
+                            mouseOut(model_name);
+                        })
+                        .on("mousedown", function () {
+                            mouseDown(model_name);
+                        });
                     pre_ratio += ratio_val;
                 });
 
-            })
+            });
+            drawRankingPath(ranking_line, model_name);
+            drawSparkLine(spark_line_y, spark_y_base, model_name)
         });
         root.selectAll('.cell-background').raise();
         root.selectAll('.model-name').raise();
         root.selectAll('.ranking-change-line').raise();
         root.selectAll('.performance-bar-stroke').raise();
         root.selectAll('.performance-bar').raise();
+        root.selectAll('.spark-line').raise();
+    }
+
+
+    function drawSparkLine(y_values, y_base, model_name) {
+        let lineData = [];
+        _.forEach(y_values, (y, digit) => {
+            lineData.push({ x: digit * 10 + TEXT_X_END + 10, y: y_base - (2 * y * BAR_HEIGHT) + BAR_HEIGHT - 10 });
+        });
+
+        // This is the accessor function
+        let lineBasis = d3.line()
+            .x(function (d) {
+                return d.x;
+            })
+            .y(function (d) {
+                return d.y;
+            })
+            .curve(d3.curveLinear); // curveBasis
+
+        // The line SVG Path we draw
+        root.append("path")
+            .attr("d", lineBasis(lineData))
+            .attrs({
+                fill: 'none',
+                stroke: CONSTANT.COLORS[model_name],
+                'stroke-width': 2,
+            })
+            .classed('spark-line', true)
+            .classed(model_name, true)
+            .on("mouseover", function () {
+                mouseOn(model_name);
+            })
+            .on("mouseout", function () {
+                mouseOut(model_name);
+            })
+            .on("mousedown", function () {
+                mouseDown(model_name);
+            });
+    }
+
+    function drawRankingPath(lineData, model_name) {
+        // This is the accessor function
+        let lineBasis = d3.line()
+            .x(function (d) {
+                return d.x;
+            })
+            .y(function (d) {
+                return d.y;
+            })
+            .curve(d3.curveLinear); // linear
+        root.append('path')
+            .attr("d", lineBasis(lineData))
+            .attrs({
+                fill: 'none',
+                stroke: CONSTANT.COLORS[model_name],
+                'stroke-width': 5,
+            })
+            .classed('ranking-change-line', true)
+            .classed(model_name, true)
+            .on("mouseover", function () {
+                mouseOn(model_name);
+            })
+            .on("mouseout", function () {
+                mouseOut(model_name);
+            })
+            .on("mousedown", function () {
+                mouseDown(model_name);
+            });
     }
 
     function removeAll() {
@@ -194,9 +315,27 @@ function modelRankingVis() {
         return ranking_info;
     }
 
-    return this;
+    function mouseOn(model_name) {
+        d3.selectAll('.cell-background' + '.' + model_name).style("fill", CONSTANT.COLORS[model_name]);
+        d3.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", CELL_HEIGHT);
+        d3.selectAll('.spark-line' + '.' + model_name).style("stroke", "#eee")
+    }
+
+    function mouseOut(model_name) {
+        d3.selectAll('.cell-background' + '.' + model_name).style("fill", "#fff");
+        d3.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", "3px");
+        d3.selectAll('.spark-line' + '.' + model_name).style("stroke", CONSTANT.COLORS[model_name])
+    }
+
+    function mouseDown(model_name) {
+        const performance_improve = Processor.getImproveInfo(model_name);
+        Components.MODEL_RANKING_VIS.update(performance_improve, 'true');
+        Components.MODEL_DIAGNOSIS_VIS.updateMatrix(model_name);
+    }
+
+    return that;
 }
 
 setTimeout(function () {
-    Util.MODEL_RANKING_VIS.update(Processor.getPerformances(CONSTANT.MODEL_NAMES), 'true');
-}, 5000);
+    Components.MODEL_RANKING_VIS.update(Processor.getPerformances(CONSTANT.MODEL_NAMES), 'true');
+}, 3000);

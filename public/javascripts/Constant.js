@@ -1,4 +1,6 @@
 const CONSTANT = new function () {
+    this.MARGIN_LEFT = 300;
+
     this.MODEL_NAMES = ['knn', 'neural_network', 'random_forest', 'softmax_regression', 'stacked_autoencoder'];
 
     // 참고 : https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
@@ -8,7 +10,7 @@ const CONSTANT = new function () {
         'improve': '#4363d8',
         'correct-both': '#83a3e8',
         'worsen': '#e6194B',
-        'false-both': '#ff699b',
+        'wrong-both': '#ff699b',
         'knn': '#469990',
         'neural_network': '#e6beff',
         'random_forest': '#9A6324',

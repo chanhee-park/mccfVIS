@@ -17,10 +17,10 @@ html {
     background: #fff;
     align-content: center; }
     #app .section.model-ranking-view {
-      height: 244px;
+      height: 214px;
       margin-bottom: 6px; }
     #app .section.model-diagnosis-view {
-      height: calc(100% - 250px - 6px);
+      height: calc(100% - 220px - 6px);
       margin-top: 6px; }
 
 svg#model-ranking-vis {
