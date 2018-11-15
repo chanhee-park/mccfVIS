@@ -18,7 +18,7 @@ function modelRankingVis() {
     const RANKING_CHANGE_LINE_LEN = 30;
     const BAR_WIDTH = CELL_WIDTH - RANKING_CHANGE_LINE_LEN;
 
-    const TEXT_X_END = 175;
+    const TEXT_X_END = CONSTANT.MARGIN_LEFT - 100;
 
     let models_performance = Processor.getPerformances(CONSTANT.MODEL_NAMES);
 
@@ -46,7 +46,7 @@ function modelRankingVis() {
                     'text-anchor': 'middle',
                     'alignment-baseline': 'central',
                     'fill': '#333',
-                    'font-size': '16px',
+                    'font-size': CONSTANT.FONT_SIZE.default,
                 })
         }
 
@@ -73,7 +73,7 @@ function modelRankingVis() {
                             'text-anchor': 'end',
                             'alignment-baseline': 'central',
                             'fill': '#333',
-                            'font-size': '16px',
+                            'font-size': CONSTANT.FONT_SIZE.default,
                         })
                         .classed('model-name', true)
                         .on("mouseover", function () {
@@ -216,7 +216,7 @@ function modelRankingVis() {
     function drawSparkLine(y_values, y_base, model_name) {
         let lineData = [];
         _.forEach(y_values, (y, digit) => {
-            lineData.push({ x: digit * 10 + TEXT_X_END + 10, y: y_base - (2 * y * BAR_HEIGHT) + BAR_HEIGHT - 10 });
+            lineData.push({ x: digit * 8 + TEXT_X_END + 10, y: y_base - (2 * y * BAR_HEIGHT) + BAR_HEIGHT - 8 });
         });
 
         // This is the accessor function
@@ -318,7 +318,7 @@ function modelRankingVis() {
     function mouseOn(model_name) {
         d3.selectAll('.cell-background' + '.' + model_name).style("fill", CONSTANT.COLORS[model_name]);
         d3.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", CELL_HEIGHT);
-        d3.selectAll('.spark-line' + '.' + model_name).style("stroke", "#eee")
+        d3.selectAll('.spark-line' + '.' + model_name).style("stroke", "#eee");
     }
 
     function mouseOut(model_name) {
@@ -328,8 +328,8 @@ function modelRankingVis() {
     }
 
     function mouseDown(model_name) {
-        const performance_improve = Processor.getImproveInfo(model_name);
-        Components.MODEL_RANKING_VIS.update(performance_improve, 'true');
+        const prediction_changes = Processor.getPredictionChangeInfo(model_name);
+        Components.MODEL_RANKING_VIS.update(prediction_changes, 'true');
         Components.MODEL_DIAGNOSIS_VIS.updateMatrix(model_name);
     }
 

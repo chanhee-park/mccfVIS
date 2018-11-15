@@ -31,7 +31,7 @@ const Processor = new function () {
         return ret;
     };
 
-    this.getImproveInfo = function (base_model_name) {
+    this.getPredictionChangeInfo = function (base_model_name) {
         let ret = {};
 
         let base_result = DATA.MODELS_PREDICTION[base_model_name];
@@ -82,7 +82,6 @@ const Processor = new function () {
     };
 
     this.getDiagnosisMatrix = function (base_model_name) {
-        let ret = {};
         let base_result = DATA.MODELS_PREDICTION[base_model_name];
 
         let err_matrix = [];
@@ -102,5 +101,45 @@ const Processor = new function () {
         });
 
         return err_matrix;
-    }
+    };
+
+    this.getImporveInfoMatrix = function (base_model_name) {
+        let base_result = DATA.MODELS_PREDICTION[base_model_name];
+        let other_model_names = [];
+        let ret = [];
+
+        _.forEach(CONSTANT.MODEL_NAMES, (model_name) => {
+            if (model_name !== base_model_name) {
+                other_model_names.push(model_name);
+            }
+        });
+
+        for (let d = 0; d < 10; d++) {
+            ret[d] = _.fill(new Array(10), []);
+            for (let p = 0; p < 10; p++) {
+                let e = {};
+                _.forEach(other_model_names, (model_name) => {
+                    e[model_name] = 0;
+                });
+                ret[d][p] = e;
+            }
+        }
+
+        _.forEach(base_result, (res, i) => {
+            let digit = res[0];
+            let base_pred = res[1];
+            if (digit !== base_pred) {
+                _.forEach(other_model_names, (model_name) => {
+                    let compare_result = DATA.MODELS_PREDICTION[model_name];
+                    if (digit === compare_result[i][1]) {
+                        ret[digit][base_pred][model_name]++;
+                    }
+                });
+            }
+        });
+
+        return ret;
+    };
+
+    return this;
 };

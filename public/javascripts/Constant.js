@@ -1,6 +1,10 @@
 const CONSTANT = new function () {
-    this.MARGIN_LEFT = 300;
+    this.MARGIN_LEFT = 270;
 
+    this.FONT_SIZE = {
+        'default': 16,
+        'large': 28,
+    };
     this.MODEL_NAMES = ['knn', 'neural_network', 'random_forest', 'softmax_regression', 'stacked_autoencoder'];
 
     // 참고 : https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
