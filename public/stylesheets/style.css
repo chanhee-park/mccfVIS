@@ -11,7 +11,16 @@ html {
   height: 1080px;
   background: #eee;
   padding: 12px;
-  margin: auto; }
+  margin: auto;
+  display: flex; }
+  #app .left {
+    flex: 8;
+    height: 100%;
+    padding: 6px; }
+  #app .right {
+    flex: 2;
+    height: 100%;
+    padding: 6px; }
   #app .section {
     width: 100%;
     background: #fff;
@@ -22,12 +31,19 @@ html {
     #app .section.model-diagnosis-view {
       height: calc(100% - 220px - 6px);
       margin-top: 6px; }
+    #app .section.instance-analysis-view {
+      height: calc(100% - 6px);
+      margin-left: 6px; }
 
 svg#model-ranking-vis {
   width: 100%;
   height: 100%; }
 
 svg#model-diagnosis-vis {
+  width: 100%;
+  height: 100%; }
+
+svg#instance-analysis-vis {
   width: 100%;
   height: 100%; }
 

@@ -2,10 +2,14 @@ extends layout
 
 block content
     #app
-        .section.model-ranking-view
-            svg#model-ranking-vis
-        .section.model-diagnosis-view
-            svg#model-diagnosis-vis
+        .left
+            .section.model-ranking-view
+                svg#model-ranking-vis
+            .section.model-diagnosis-view
+                svg#model-diagnosis-vis
+        .right
+            .section.instance-analysis-view
+                svg#instance-analysis-vis
 
     script(type='text/javascript', src='/javascripts/Constant.js')
     script(type='text/javascript', src='/javascripts/Data.js')

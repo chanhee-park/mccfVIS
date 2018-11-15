@@ -14,6 +14,15 @@ html
   background: #eee
   padding: $app-padding
   margin: auto
+  display: flex
+  .left
+    flex: 8
+    height: 100%
+    padding: $section-margin
+  .right
+    flex: 2
+    height: 100%
+    padding: $section-margin
   .section
     width: 100%
     background: #fff
@@ -24,12 +33,18 @@ html
     &.model-diagnosis-view
       height: calc(100% - #{$ranking-vis-height} - #{$section-margin})
       margin-top: $section-margin
+    &.instance-analysis-view
+      height: calc(100% - #{$section-margin})
+      margin-left: $section-margin
 
 svg
   &#model-ranking-vis
     width: 100%
     height: 100%
   &#model-diagnosis-vis
+    width: 100%
+    height: 100%
+  &#instance-analysis-vis
     width: 100%
     height: 100%
 

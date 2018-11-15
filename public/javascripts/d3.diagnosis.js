@@ -3,13 +3,14 @@ function modelDiagnosisVis() {
 
     const root = d3.select('#model-diagnosis-vis');
 
-    const WIDTH = 1896;
+    const WIDTH = 1516;
     const HEIGHT = 829;
 
-    const MARGIN_TOP = 10;
+    const MARGIN_TOP = 50;
+    const MARGIN_BOTTOM = 20;
     const MARGIN_LEFT = CONSTANT.MARGIN_LEFT;
 
-    const MATRIX_HEIGHT = HEIGHT - MARGIN_TOP;
+    const MATRIX_HEIGHT = HEIGHT - MARGIN_TOP - MARGIN_BOTTOM;
     const MATRIX_WIDTH = WIDTH - MARGIN_LEFT;
 
     const CELL_HEIGHT = MATRIX_HEIGHT / 10;

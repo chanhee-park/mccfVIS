@@ -3,10 +3,10 @@ function modelRankingVis() {
 
     const root = d3.select('#model-ranking-vis');
 
-    const WIDTH = 1896;
+    const WIDTH = 1516;
     const HEIGHT = 213;
 
-    const MARGIN_TOP = 30;
+    const MARGIN_TOP = 50;
     const RANKING_VIS_HEIGHT = HEIGHT - MARGIN_TOP;
     const CELL_HEIGHT = RANKING_VIS_HEIGHT / (CONSTANT.MODEL_NAMES.length);
     const BAR_HEIGHT = CELL_HEIGHT * 0.5;
