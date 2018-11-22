@@ -162,5 +162,10 @@ const Processor = new function () {
         return idxs;
     };
 
+    this.getAvgFromJson = function (json) {
+        let values = _.values(json);
+        return _.mean(values);
+    };
+
     return this;
 };

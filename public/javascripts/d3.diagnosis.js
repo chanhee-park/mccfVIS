@@ -4,9 +4,9 @@ function modelDiagnosisVis() {
     const root = d3.select('#model-diagnosis-vis');
 
     const WIDTH = 1516;
-    const HEIGHT = 850;
+    const HEIGHT = 788;
 
-    const MARGIN_TOP = 50;
+    const MARGIN_TOP = 10;
     const MARGIN_BOTTOM = 20;
     const MARGIN_LEFT = CONSTANT.MARGIN_LEFT;
     const MARGIN_RIGHT = CONSTANT.MARGIN_RIGHT;
@@ -92,7 +92,7 @@ function modelDiagnosisVis() {
 
         root.selectAll('.matrix').remove();
 
-        writeModelName(model_name);
+        // writeModelName(model_name);
 
         for (let digit = 0; digit < 10; digit++) {
             for (let predict = 0; predict < 10; predict++) {

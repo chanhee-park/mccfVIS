@@ -1,19 +1,19 @@
 const CONSTANT = new function () {
-    this.MARGIN_LEFT = 150;
+    this.MARGIN_LEFT = 270;
     this.MARGIN_RIGHT = 30;
 
     this.FONT_SIZE = {
         'default': 16,
         'large': 28,
     };
-    this.MODEL_NAMES = ['knn', 'random_forest', 'softmax_regression', 'neural_network', 'stacked_autoencoder'];
+    this.MODEL_NAMES = ['stacked_autoencoder', 'neural_network', 'random_forest', 'softmax_regression', 'knn'];
 
     this.MODEL_NAMES_TO_DRWA = {
-        'knn': 'm-0',
-        'random_forest': 'm-1',
-        'softmax_regression': 'm-2',
-        'neural_network': 'm-3',
-        'stacked_autoencoder': 'm-4'
+        'stacked_autoencoder': 'm-0',
+        'neural_network': 'm-1',
+        'random_forest': 'm-2',
+        'softmax_regression': 'm-3',
+        'knn': 'm-4',
     };
     // 참고 : https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
     this.COLORS = {

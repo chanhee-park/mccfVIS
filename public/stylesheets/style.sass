@@ -8,36 +8,53 @@ html
   width: 100%
   height: 100%
 
+.section
+  width: 100%
+  background: #fff
+  align-content: center
+
 #app
   width: 1920px
   height: 1200px
   background: #eee
   padding: $app-padding
   margin: auto
-  display: flex
-  .left
-    flex: 8
-    height: 100%
-    padding: $section-margin
-  .right
-    flex: 2
-    height: 100%
-    padding: $section-margin
-  .section
+  .title
+    display: block
     width: 100%
-    background: #fff
-    align-content: center
-    &.model-ranking-view
-      height: $ranking-vis-height - $section-margin
-    &.model-diagnosis-view
-      height: calc(100% - #{$ranking-vis-height} - #{$section-margin})
-    &.instance-analysis-view
-      height: calc(100% - 2 * #{$section-margin})
-      margin-left: $section-margin
+    height: $title-height
+    padding: $section-padding
+    .text
+      font-size: $title-height/2
+      line-height: $title-height
+      padding-left: 10px
+      font-weight: 600
+  .visualization-zone
+    display: flex
+    width: 100%
+    height: calc(100% - #{$title-height})
+    padding-top: $section-padding
+    .left
+      flex: 8
+      height: 100%
+      padding: $section-padding $section-padding 0 0
+    .right
+      flex: 2
+      height: 100%
+      padding: $section-padding $section-padding 0 0
+    .section
+      &.model-ranking-view
+        height: $ranking-vis-height - $section-padding
+      &.model-diagnosis-view
+        height: calc(100% - #{$ranking-vis-height} - #{$section-padding})
+      &.instance-analysis-view
+        height: calc(100% - 2 * #{$section-padding})
+        margin-left: $section-margin
 
 .section.instance-analysis-view
   .scroll-area
-    height: calc(100% - 364px - #{$section-margin})
+    margin-top: - $section-margin
+    height: calc(100% - 364px  - #{$section-margin})
     overflow-y: scroll
 
 svg
@@ -49,7 +66,8 @@ svg
     height: 100%
   &#instance-analysis-vis
     width: 100%
-    height: 364px
+    height: 370px
+    border-bottom: 2px solid #bbb
   &#instance-analysis-vis__scroll-area
     width: 100%
     height: 700px

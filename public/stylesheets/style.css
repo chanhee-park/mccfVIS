@@ -6,35 +6,51 @@ html {
   width: 100%;
   height: 100%; }
 
+.section {
+  width: 100%;
+  background: #fff;
+  align-content: center; }
+
 #app {
   width: 1920px;
   height: 1200px;
   background: #eee;
   padding: 12px;
-  margin: auto;
-  display: flex; }
-  #app .left {
-    flex: 8;
-    height: 100%;
-    padding: 6px; }
-  #app .right {
-    flex: 2;
-    height: 100%;
-    padding: 6px; }
-  #app .section {
+  margin: auto; }
+  #app .title {
+    display: block;
     width: 100%;
-    background: #fff;
-    align-content: center; }
-    #app .section.model-ranking-view {
+    height: 50px;
+    padding: 6px; }
+    #app .title .text {
+      font-size: 25px;
+      line-height: 50px;
+      padding-left: 10px;
+      font-weight: 600; }
+  #app .visualization-zone {
+    display: flex;
+    width: 100%;
+    height: calc(100% - 50px);
+    padding-top: 6px; }
+    #app .visualization-zone .left {
+      flex: 8;
+      height: 100%;
+      padding: 6px 6px 0 0; }
+    #app .visualization-zone .right {
+      flex: 2;
+      height: 100%;
+      padding: 6px 6px 0 0; }
+    #app .visualization-zone .section.model-ranking-view {
       height: 294px; }
-    #app .section.model-diagnosis-view {
+    #app .visualization-zone .section.model-diagnosis-view {
       height: calc(100% - 300px - 6px); }
-    #app .section.instance-analysis-view {
+    #app .visualization-zone .section.instance-analysis-view {
       height: calc(100% - 2 * 6px);
       margin-left: 6px; }
 
 .section.instance-analysis-view .scroll-area {
-  height: calc(100% - 364px - 6px);
+  margin-top: -6px;
+  height: calc(100% - 364px  - 6px);
   overflow-y: scroll; }
 
 svg#model-ranking-vis {
@@ -47,7 +63,8 @@ svg#model-diagnosis-vis {
 
 svg#instance-analysis-vis {
   width: 100%;
-  height: 364px; }
+  height: 370px;
+  border-bottom: 2px solid #bbb; }
 
 svg#instance-analysis-vis__scroll-area {
   width: 100%;

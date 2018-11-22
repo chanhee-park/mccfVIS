@@ -5,7 +5,7 @@ function instanceAnalysisVis() {
     const root_scroll_area = d3.select('#instance-analysis-vis__scroll-area');
 
     const WIDTH = 374;
-    const INFO_AREA_HEIGHT = 364;
+    const INFO_AREA_HEIGHT = 361;
     let SCROLL_AREA_HEIGHT = 1000;
 
     const MARGIN_LEFT = 20;
@@ -25,7 +25,7 @@ function instanceAnalysisVis() {
 
     this.drawInstanceList = function (condition) {
         imgs_idx = Processor.getImgsIdx(condition);
-        SCROLL_AREA_HEIGHT = imgs_idx.length * CELL_SIZE;
+        SCROLL_AREA_HEIGHT = imgs_idx.length * CELL_SIZE + 2;
         d3.select('#instance-analysis-vis__scroll-area').style('height', SCROLL_AREA_HEIGHT);
         drawTitle(condition);
         drawAvgImg(condition.model_name, condition.digit, condition.predict);
@@ -115,7 +115,7 @@ function instanceAnalysisVis() {
         }
 
         // 가로 줄
-        for (let i = 0; i < num_of_instances + 1; i++) {
+        for (let i = 0; i <= num_of_instances + 1; i++) {
             root_scroll_area.append('line')
                 .attrs({
                     x1: 0,
