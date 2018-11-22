@@ -21,10 +21,10 @@ function modelRankingVis() {
 
     const TEXT_X_END = 50;
     const SPARK_LINE_MARGIN = 20;
-    const SPARK_LINE_INTERVAL = ( MARGIN_LEFT - TEXT_X_END - (SPARK_LINE_MARGIN * 2) - 50) / 11;
+    const SPARK_LINE_INTERVAL = (MARGIN_LEFT - TEXT_X_END - (SPARK_LINE_MARGIN * 2) - 60) / 11;
 
     const CIRCLE_STROKE_WIDTH = 4;
-    const RANKING_STROKE_WIDTH = 10;
+    const RANKING_STROKE_WIDTH = 7;
 
     const MIN_SCORE = 0.5;
     const MAX_RADIUS = CELL_HEIGHT / 2;
@@ -102,18 +102,32 @@ function modelRankingVis() {
                 })
                 .classed(model_name, true);
 
-            // 셀은 흰색 배경을 가진다.
+            // 제목 셀의 하이라이팅을 위한 배경
             root.append('rect')
                 .attrs({
                     x: 15,
                     y: MARGIN_TOP + (i * CELL_HEIGHT) + CELL_HEIGHT * 0.1,
                     width: MARGIN_LEFT - 40,
                     height: HEIGHT_RANKING_LINE_HEIGHT,
-                    fill: '#fff',
+                    fill: CONSTANT.COLORS[model_name],
+                    opacity: 0
                 })
                 .classed('cell-background', true)
                 .classed('name-cell-background', true)
                 .classed(model_name, true);
+
+            // 짝수열 회색배경으로 구분
+            if (i % 2 === 0) {
+                root.append('rect')
+                    .attrs({
+                        x: 15,
+                        y: MARGIN_TOP + (i * CELL_HEIGHT),
+                        width: MARGIN_LEFT,
+                        height: CELL_HEIGHT,
+                        fill: '#eee',
+                    })
+                    .classed('cell-background', true);
+            }
 
             ranking_line.push({
                 x: MARGIN_LEFT - 45,
@@ -127,17 +141,32 @@ function modelRankingVis() {
             // 각각의 클래스를 순회하며 그린다.
             const spark_line_y = [];
             _.forEach(model_performance, (performance_by_class, digit) => {
-                digit = parseInt(digit);
-                const ranking = ranking_info[digit].indexOf(model_name);
                 spark_line_y.push(performance_by_class['true']);
+                digit = parseInt(digit);
 
+                const ranking = ranking_info[digit].indexOf(model_name);
+                const x = MARGIN_LEFT + (digit * CELL_WIDTH);
+                const y = MARGIN_TOP + (ranking * CELL_HEIGHT);
+
+                // 짝수열 회색 배경으로 구분
+                if (ranking % 2 === 0) {
+                    root.append('rect')
+                        .attrs({
+                            x: x,
+                            y: y,
+                            width: CELL_WIDTH,
+                            height: CELL_HEIGHT,
+                            fill: '#eee',
+                        })
+                        .classed('cell-background', true);
+                }
 
                 // 정답률을 표현한다.
                 const performance = performance_by_class['true'];
                 const percentage = Math.round(100 * performance);
                 const r = getRadiusByPerformance(performance);
-                const cx = MARGIN_LEFT + (digit * CELL_WIDTH) + (CELL_WIDTH / 2);
-                const cy = MARGIN_TOP + BAR_MARGIN_TOP + (ranking * CELL_HEIGHT) + BAR_HEIGHT / 2;
+                const cx = x + (CELL_WIDTH / 2);
+                const cy = y + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP;
 
                 root.append('circle')
                     .attrs({
@@ -315,7 +344,7 @@ function modelRankingVis() {
     }
 
     function SortSvgObjs() {
-        root.selectAll('.cell-background').raise();
+        root.selectAll('.name-cell-background').raise();
         root.selectAll('.model-name').raise();
         root.selectAll('.ranking-change-line').raise();
         root.selectAll('.performance-each').raise();
@@ -376,7 +405,7 @@ function modelRankingVis() {
 
     function highlightModel(model_name) {
         const color = CONSTANT.COLORS[model_name];
-        root.selectAll('.name-cell-background' + '.' + model_name).style("fill", color);
+        root.selectAll('.name-cell-background' + '.' + model_name).style("opacity", 1);
         root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", HEIGHT_RANKING_LINE_HEIGHT);
         root.selectAll('circle' + '.' + model_name).style('stroke', '#000');
         root.selectAll('circle' + '.' + model_name).style('stroke-width', CIRCLE_STROKE_WIDTH / 2);
@@ -384,8 +413,7 @@ function modelRankingVis() {
 
     function deHighlightModel(model_name) {
         const color = CONSTANT.COLORS[model_name];
-
-        root.selectAll('.name-cell-background' + '.' + model_name).style("fill", "#fff");
+        root.selectAll('.name-cell-background' + '.' + model_name).style("opacity", 0);
         root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", RANKING_STROKE_WIDTH);
         root.selectAll('circle' + '.' + model_name).style('stroke', color);
         root.selectAll('circle' + '.' + model_name).style('stroke-width', CIRCLE_STROKE_WIDTH);
