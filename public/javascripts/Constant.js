@@ -1,5 +1,5 @@
 const CONSTANT = new function () {
-    this.MARGIN_LEFT = 270;
+    this.MARGIN_LEFT = 320;
     this.MARGIN_RIGHT = 30;
 
     this.FONT_SIZE = {

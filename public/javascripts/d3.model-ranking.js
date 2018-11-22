@@ -4,24 +4,30 @@ function modelRankingVis() {
     const root = d3.select('#model-ranking-vis');
 
     const WIDTH = 1516;
-    const HEIGHT = 300;
+    // const WIDTH = 1316;
+    const HEIGHT = 334;
 
-    const MARGIN_TOP = 70;
+    const MARGIN_TOP = 80;
     const RANKING_VIS_HEIGHT = HEIGHT - MARGIN_TOP;
     const CELL_HEIGHT = RANKING_VIS_HEIGHT / (CONSTANT.MODEL_NAMES.length);
-    const BAR_HEIGHT = CELL_HEIGHT * 0.5;
-    const BAR_MARGIN_TOP = CELL_HEIGHT * 0.2;
+    const BAR_HEIGHT = CELL_HEIGHT * 0.6;
+    const BAR_MARGIN_TOP = (CELL_HEIGHT - BAR_HEIGHT) / 2;
+    const HEIGHT_RANKING_LINE_HEIGHT = CELL_HEIGHT * 0.8;
 
     const MARGIN_LEFT = CONSTANT.MARGIN_LEFT;
     const MARGIN_RIGHT = CONSTANT.MARGIN_RIGHT;
     const RANKING_VIS_WIDTH = WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
     const CELL_WIDTH = RANKING_VIS_WIDTH / 10;
-    const RANKING_CHANGE_LINE_LEN = 40;
-    const BAR_WIDTH = CELL_WIDTH - RANKING_CHANGE_LINE_LEN;
 
-    const TEXT_X_END = CONSTANT.MARGIN_LEFT - 220;
-    const SPARK_LINE_INTERVAL = 13;
+    const TEXT_X_END = 50;
     const SPARK_LINE_MARGIN = 20;
+    const SPARK_LINE_INTERVAL = ( MARGIN_LEFT - TEXT_X_END - (SPARK_LINE_MARGIN * 2) - 50) / 11;
+
+    const CIRCLE_STROKE_WIDTH = 4;
+    const RANKING_STROKE_WIDTH = 10;
+
+    const MIN_SCORE = 0.5;
+    const MAX_RADIUS = CELL_HEIGHT / 2;
 
     let models_performance = Processor.getPerformances(CONSTANT.MODEL_NAMES);
 
@@ -46,19 +52,29 @@ function modelRankingVis() {
             .text("ACTUAL CLASS")
             .attrs({
                 x: WIDTH / 2,
-                y: 15,
+                y: MARGIN_TOP - 50,
+                'font-size': CONSTANT.FONT_SIZE.default,
+                'fill': '#555',
+                'text-anchor': 'middle',
+                'alignment-baseline': 'hanging',
+            });
+        root.append('text')
+            .text("Average")
+            .attrs({
+                x: TEXT_X_END + SPARK_LINE_MARGIN * 3 + SPARK_LINE_INTERVAL * 10,
+                y: MARGIN_TOP - 25,
                 'font-size': CONSTANT.FONT_SIZE.default,
                 'fill': '#555',
                 'text-anchor': 'middle',
                 'alignment-baseline': 'hanging',
             });
         for (let digit = 0; digit < 10; digit++) {
-            const x = MARGIN_LEFT + CELL_WIDTH * digit + BAR_WIDTH / 2;
+            const x = MARGIN_LEFT + CELL_WIDTH * digit + CELL_WIDTH / 2;
             root.append('text')
                 .text(digit)
                 .attrs({
                     x: x,
-                    y: 45,
+                    y: MARGIN_TOP - 25,
                     'font-size': CONSTANT.FONT_SIZE.default,
                     'fill': '#555',
                     'text-anchor': 'middle',
@@ -72,63 +88,40 @@ function modelRankingVis() {
             const ranking_line = [];
 
             // 모델 이름을 적는다.
-            let spark_y_base = MARGIN_TOP + ((i + 1) * CELL_HEIGHT);
+            const x = TEXT_X_END - SPARK_LINE_MARGIN;
+            const y = MARGIN_TOP + (i * CELL_HEIGHT);
             root.append('text')
                 .text(CONSTANT.MODEL_NAMES_TO_DRWA[model_name])
                 .attrs({
-                    x: TEXT_X_END - SPARK_LINE_MARGIN,
-                    y: MARGIN_TOP + (i * CELL_HEIGHT) + (CELL_HEIGHT / 2),
+                    x: x,
+                    y: y + (CELL_HEIGHT / 2),
                     'text-anchor': 'start',
                     'alignment-baseline': 'middle',
                     'fill': '#333',
                     'font-size': CONSTANT.FONT_SIZE.default,
                 })
-                .classed('model-name', true)
-                .on("mouseover", function () {
-                    mouseOn(model_name);
-                })
-                .on("mouseout", function () {
-                    mouseOut(model_name);
-                })
-                .on("mousedown", function () {
-                    mouseDown(model_name);
-                });
+                .classed(model_name, true);
+
             // 셀은 흰색 배경을 가진다.
             root.append('rect')
                 .attrs({
-                    x: 0,
-                    y: MARGIN_TOP + (i * CELL_HEIGHT) - 2 + CELL_HEIGHT * 0.1,
-                    width: MARGIN_LEFT - 30,
-                    height: CELL_HEIGHT * 0.8,
+                    x: 15,
+                    y: MARGIN_TOP + (i * CELL_HEIGHT) + CELL_HEIGHT * 0.1,
+                    width: MARGIN_LEFT - 40,
+                    height: HEIGHT_RANKING_LINE_HEIGHT,
                     fill: '#fff',
                 })
                 .classed('cell-background', true)
                 .classed('name-cell-background', true)
-                .classed(model_name, true)
-                .on("mouseover", function () {
-                    mouseOn(model_name);
-                })
-                .on("mouseout", function () {
-                    mouseOut(model_name);
-                })
-                .on("mousedown", function () {
-                    mouseDown(model_name);
-                });
+                .classed(model_name, true);
+
             ranking_line.push({
-                x: MARGIN_LEFT - 40,
-                y: MARGIN_TOP + (i * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP
+                x: MARGIN_LEFT - 45,
+                y: y + (CELL_HEIGHT / 2)
             });
             ranking_line.push({
-                x: MARGIN_LEFT - 30,
-                y: MARGIN_TOP + (i * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP
-            });
-            ranking_line.push({
-                x: MARGIN_LEFT,
-                y: MARGIN_TOP + (ranking_info[0].indexOf(model_name) * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP
-            });
-            ranking_line.push({
-                x: MARGIN_LEFT + 10,
-                y: MARGIN_TOP + (ranking_info[0].indexOf(model_name) * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP
+                x: MARGIN_LEFT - 15,
+                y: y + (CELL_HEIGHT / 2)
             });
 
             // 각각의 클래스를 순회하며 그린다.
@@ -138,101 +131,81 @@ function modelRankingVis() {
                 const ranking = ranking_info[digit].indexOf(model_name);
                 spark_line_y.push(performance_by_class['true']);
 
-                // 셀은 흰색 배경을 가진다.
-                root.append('rect')
+
+                // 정답률을 표현한다.
+                const performance = performance_by_class['true'];
+                const percentage = Math.round(100 * performance);
+                const r = getRadiusByPerformance(performance);
+                const cx = MARGIN_LEFT + (digit * CELL_WIDTH) + (CELL_WIDTH / 2);
+                const cy = MARGIN_TOP + BAR_MARGIN_TOP + (ranking * CELL_HEIGHT) + BAR_HEIGHT / 2;
+
+                root.append('circle')
                     .attrs({
-                        x: MARGIN_LEFT + (digit * CELL_WIDTH) - 2,
-                        y: MARGIN_TOP + (ranking * CELL_HEIGHT) - 2,
-                        width: BAR_WIDTH + 10,
-                        height: CELL_HEIGHT,
+                        cx: cx,
+                        cy: cy,
+                        r: r - CIRCLE_STROKE_WIDTH / 2,
                         fill: '#fff',
+                        stroke: CONSTANT.COLORS[model_name],
+                        'stroke-width': CIRCLE_STROKE_WIDTH,
+                        'stroke-position': 'inside',
                     })
-                    .classed('cell-background', true)
-                    .classed(model_name, true)
-                    .on("mouseover", function () {
-                        mouseOn(model_name);
+                    .classed('performance-each', true)
+                    .classed(model_name, true);
+                root.append('text')
+                    .text(percentage)
+                    .attrs({
+                        x: cx,
+                        y: cy,
+                        'text-anchor': 'middle',
+                        'alignment-baseline': 'middle',
                     })
-                    .on("mouseout", function () {
-                        mouseOut(model_name);
-                    })
-                    .on("mousedown", function () {
-                        mouseDown(model_name);
-                    });
+                    .classed('performance-each', true)
+                    .classed(model_name, true);
 
                 // 순위 변경선을 그린다.
                 const next_digit = digit + 1;
                 const next_ranking = digit !== 9 ? ranking_info[next_digit].indexOf(model_name) : ranking;
 
                 ranking_line.push({
-                    x: MARGIN_LEFT + (digit * CELL_WIDTH) + BAR_WIDTH,
-                    y: MARGIN_TOP + (ranking * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP
+                    x: cx - 30,
+                    y: cy
+                });
+                ranking_line.push({
+                    x: cx + 30,
+                    y: cy
                 });
                 if (digit !== 9) {
                     ranking_line.push({
-                        x: MARGIN_LEFT + (next_digit * CELL_WIDTH),
+                        x: cx + CELL_WIDTH - 30,
+                        y: MARGIN_TOP + (next_ranking * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP
+                    });
+                    ranking_line.push({
+                        x: cx + CELL_WIDTH + 30,
                         y: MARGIN_TOP + (next_ranking * CELL_HEIGHT) + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP
                     });
                 }
-
-
-                // 바를 그린다.
-                // 스트로크를 배경 사각형으로 표현한다.
-                root.append('rect')
-                    .attrs({
-                        x: MARGIN_LEFT + (digit * CELL_WIDTH) - 2,
-                        y: MARGIN_TOP + BAR_MARGIN_TOP + (ranking * CELL_HEIGHT) - 2,
-                        width: BAR_WIDTH + 4,
-                        height: BAR_HEIGHT + 4,
-                        fill: '#777',
-                    })
-                    .classed('performance-bar-stroke', true)
-                    .on("mouseover", function () {
-                        mouseOn(model_name);
-                    })
-                    .on("mouseout", function () {
-                        mouseOut(model_name);
-                    })
-                    .on("mousedown", function () {
-                        mouseDown(model_name);
-                    });
-
-                // < 맞음, 틀림, 개선, 악화> 등에 맞춰 각각의 비율을 그린다.
-                let pre_ratio = 0;
-
-                _.forEach(performance_by_class, (ratio_val, ratio_name) => {
-                    if (pre_ratio >= 0.999) {
-                        ratio_val = 0;
-                    }
-                    root.append('rect')
-                        .attrs({
-                            x: MARGIN_LEFT + (digit * CELL_WIDTH) + (pre_ratio * BAR_WIDTH),
-                            y: MARGIN_TOP + BAR_MARGIN_TOP + (ranking * CELL_HEIGHT),
-                            width: ratio_val * BAR_WIDTH,
-                            height: BAR_HEIGHT,
-                            fill: CONSTANT.COLORS[ratio_name],
-                        })
-                        .classed('performance-bar', true)
-                        .on("mouseover", function () {
-                            mouseOn(model_name);
-                        })
-                        .on("mouseout", function () {
-                            mouseOut(model_name);
-                        })
-                        .on("mousedown", function () {
-                            mouseDown(model_name);
-                        });
-                    pre_ratio += ratio_val;
-                });
-
             });
+
             drawRankingPath(ranking_line, model_name);
-            drawSparkLine(spark_line_y, spark_y_base, model_name);
-            drawAvgPerformance(spark_line_y, spark_y_base, model_name);
+            drawHeatMap(spark_line_y, i, model_name);
+            drawSparkLine(spark_line_y, i, model_name);
+            drawAvgPerformance(spark_line_y, i, model_name);
+
+            // add Interaction
+            d3.selectAll('.' + model_name)
+                .on("mouseover", function () {
+                    mouseOn(model_name);
+                })
+                .on("mouseout", function () {
+                    mouseOut(model_name);
+                })
+                .on("mousedown", function () {
+                    mouseDown(model_name);
+                });
         });
 
         SortSvgObjs();
     }
-
 
     function drawRankingPath(lineData, model_name) {
         // This is the accessor function
@@ -243,35 +216,59 @@ function modelRankingVis() {
             .y(function (d) {
                 return d.y;
             })
-            .curve(d3.curveLinear); // linear
+            .curve(d3.curveLinear); // curveLinear
         root.append('path')
             .attr("d", lineBasis(lineData))
             .attrs({
                 fill: 'none',
                 stroke: CONSTANT.COLORS[model_name],
-                'stroke-width': 3,
+                'stroke-width': RANKING_STROKE_WIDTH,
             })
             .classed('ranking-change-line', true)
             .classed('selected', false)
             .classed(model_name, true)
-            .on("mouseover", function () {
-                mouseOn(model_name);
-            })
-            .on("mouseout", function () {
-                mouseOut(model_name);
-            })
-            .on("mousedown", function () {
-                mouseDown(model_name);
-            });
     }
 
-    function drawSparkLine(y_values, y_base, model_name) {
+    function drawAvgPerformance(performances_by_class, yi, model_name) {
+        const avgPerformance = Processor.getAvgFromJson(performances_by_class);
+        const percentage = Math.round(100 * avgPerformance);
+        const cx = TEXT_X_END + SPARK_LINE_MARGIN * 3 + SPARK_LINE_INTERVAL * 10;
+        let y = yi * CELL_HEIGHT + MARGIN_TOP;
+        const cy = y + CELL_HEIGHT / 2;
+        const r = getRadiusByPerformance(avgPerformance);
+
+        root.append('circle')
+            .attrs({
+                cx: cx,
+                cy: cy,
+                r: r - CIRCLE_STROKE_WIDTH / 2,
+                fill: '#fff',
+                stroke: CONSTANT.COLORS[model_name],
+                'stroke-width': CIRCLE_STROKE_WIDTH,
+            })
+            .classed("avg-performance", true)
+            .classed(model_name, true);
+
+        root.append('text')
+            .text(percentage)
+            .attrs({
+                x: cx,
+                y: cy,
+                'text-anchor': 'middle',
+                'alignment-baseline': 'middle',
+            })
+            .classed("avg-performance", true)
+            .classed(model_name, true);
+    }
+
+    function drawSparkLine(scores, yi, model_name) {
         let lineData = [];
-        _.forEach(y_values, (y, digit) => {
-            lineData.push({
-                x: digit * SPARK_LINE_INTERVAL + TEXT_X_END + SPARK_LINE_MARGIN,
-                y: y_base - (2 * y * BAR_HEIGHT) + BAR_HEIGHT - 8
-            });
+        _.forEach(scores, (score, digit) => {
+            const redundancy_score = getRedundancy(score, MIN_SCORE);
+            const x = (digit * SPARK_LINE_INTERVAL) + (SPARK_LINE_INTERVAL / 2) + TEXT_X_END + SPARK_LINE_MARGIN;
+            const y_base = (yi * CELL_HEIGHT) + MARGIN_TOP + BAR_MARGIN_TOP + BAR_HEIGHT;
+            const y = y_base - (redundancy_score * BAR_HEIGHT);
+            lineData.push({ x, y });
         });
 
         // This is the accessor function
@@ -290,64 +287,42 @@ function modelRankingVis() {
             .attrs({
                 fill: 'none',
                 stroke: CONSTANT.COLORS[model_name],
-                'stroke-width': 2,
+                'stroke-width': 3,
             })
             .classed('spark-line', true)
             .classed(model_name, true)
-            .on("mouseover", function () {
-                mouseOn(model_name);
-            })
-            .on("mouseout", function () {
-                mouseOut(model_name);
-            })
-            .on("mousedown", function () {
-                mouseDown(model_name);
-            });
     }
 
-    function drawAvgPerformance(performances_by_class, y_base, model_name) {
-        const avgPerformance = Processor.getAvgFromJson(performances_by_class);
-        const percentage = Math.round(100 * avgPerformance);
-        const cx = TEXT_X_END + SPARK_LINE_MARGIN * 2 + SPARK_LINE_INTERVAL * 10;
-        const cy = y_base - BAR_HEIGHT;
-        const r = BAR_HEIGHT * 0.6;
+    function drawHeatMap(scores, yi, model_name) {
+        _.forEach(scores, (score, digit) => {
+            let color = getHexColorByPerformance(score);
+            const x = TEXT_X_END + SPARK_LINE_MARGIN + digit * SPARK_LINE_INTERVAL;
+            const y = yi * CELL_HEIGHT + MARGIN_TOP + BAR_MARGIN_TOP;
+            root.append('rect')
+                .attrs({
+                    x: x,
+                    y: y,
+                    width: SPARK_LINE_INTERVAL,
+                    height: BAR_HEIGHT,
+                    fill: color,
+                    stroke: getHexColorByPerformance(0.7),
+                    'stroke-width': 1
+                })
+                .classed('heat-map', true)
+                .classed(model_name, true);
+        });
 
-        root.append('circle')
-            .attrs({
-                cx: cx,
-                cy: cy,
-                r: r,
-                fill: '#fff',
-                stroke: CONSTANT.COLORS[model_name],
-                'stroke-width': '2px'
-            })
-            .classed("avg-performance", true)
-            .classed(model_name, true);
-
-        root.append('text')
-            .text(percentage)
-            .attrs({
-                x: cx,
-                y: cy,
-                'text-anchor': 'middle',
-                'alignment-baseline': 'middle',
-            })
-            .classed("avg-performance", true)
-            .classed(model_name, true);
-    }
-
-    function removeAll() {
-        d3.selectAll('#model-ranking-vis > *').remove();
     }
 
     function SortSvgObjs() {
         root.selectAll('.cell-background').raise();
         root.selectAll('.model-name').raise();
         root.selectAll('.ranking-change-line').raise();
-        root.selectAll('.performance-bar-stroke').raise();
-        root.selectAll('.performance-bar').raise();
+        root.selectAll('.performance-each').raise();
+        root.selectAll('.heat-map').raise();
         root.selectAll('.spark-line').raise();
         root.selectAll('.avg-performance').raise();
+        root.selectAll('text').raise();
     }
 
     /**
@@ -390,7 +365,6 @@ function modelRankingVis() {
         highlightModel(selected_model);
     }
 
-
     function mouseDown(model_name) {
         selected_model = model_name;
         highlightModel(selected_model);
@@ -403,25 +377,56 @@ function modelRankingVis() {
     function highlightModel(model_name) {
         const color = CONSTANT.COLORS[model_name];
         root.selectAll('.name-cell-background' + '.' + model_name).style("fill", color);
-        root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", CELL_HEIGHT * 0.8);
-        root.selectAll('.spark-line' + '.' + model_name).style("stroke", "#000");
-        root.selectAll('circle.avg-performance' + '.' + model_name).style('stroke', '#000');
-        root.selectAll('circle.avg-performance' + '.' + model_name).style('fill', color);
+        root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", HEIGHT_RANKING_LINE_HEIGHT);
+        root.selectAll('circle' + '.' + model_name).style('stroke', '#000');
+        root.selectAll('circle' + '.' + model_name).style('stroke-width', CIRCLE_STROKE_WIDTH / 2);
     }
 
     function deHighlightModel(model_name) {
         const color = CONSTANT.COLORS[model_name];
 
         root.selectAll('.name-cell-background' + '.' + model_name).style("fill", "#fff");
-        root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", "3px");
-        root.selectAll('.spark-line' + '.' + model_name).style("stroke", color);
-        root.selectAll('circle.avg-performance' + '.' + model_name).style('stroke', color);
-        root.selectAll('circle.avg-performance' + '.' + model_name).style('fill', '#fff');
+        root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", RANKING_STROKE_WIDTH);
+        root.selectAll('circle' + '.' + model_name).style('stroke', color);
+        root.selectAll('circle' + '.' + model_name).style('stroke-width', CIRCLE_STROKE_WIDTH);
+
+    }
+
+    function getRadiusByPerformance(performance) {
+        const redundancy = getRedundancy(performance, MIN_SCORE);
+        return redundancy * MAX_RADIUS;
+    }
+
+    function getHexColorByPerformance(performance) {
+        // score 0.5 -> white (#fff) // score 1 -> black (#000)
+        let redundancy = 1 - getRedundancy(performance, MIN_SCORE);
+
+        const color_decimal = Math.round(256 * redundancy);
+        let hex = color_decimal.toString(16);
+        hex = hex.length > 1 ? hex : '0' + hex;
+
+        return '#' + hex + hex + hex;
+    }
+
+    /**
+     * min value ~ 1 사이의 값을 0 ~ 1 사이 값으로 변경해준다.
+     * @param value
+     * @param min_value
+     * @returns {number}
+     */
+    function getRedundancy(value, min_value) {
+        let redundancy = value - min_value;
+        redundancy = redundancy / (1 - min_value);
+        return redundancy;
+    }
+
+    function removeAll() {
+        d3.selectAll('#model-ranking-vis > *').remove();
     }
 
     return that;
 }
 
-// setTimeout(function () {
-//     Components.MODEL_RANKING_VIS.update(Processor.getPerformances(CONSTANT.MODEL_NAMES), 'true');
-// }, 3000);
+setTimeout(function () {
+    // Components.MODEL_RANKING_VIS.update(Processor.getPerformances(CONSTANT.MODEL_NAMES), 'true');
+}, 3000);

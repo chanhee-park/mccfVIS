@@ -5,13 +5,13 @@ function instanceAnalysisVis() {
     const root_scroll_area = d3.select('#instance-analysis-vis__scroll-area');
 
     const WIDTH = 374;
-    const INFO_AREA_HEIGHT = 361;
+    const INFO_AREA_HEIGHT = 334;
     let SCROLL_AREA_HEIGHT = 1000;
 
     const MARGIN_LEFT = 20;
 
     const VIEW_WIDTH = WIDTH - MARGIN_LEFT;
-    const AVG_IMG_LEN = (VIEW_WIDTH - MARGIN_LEFT) * 0.8;
+    const AVG_IMG_LEN = VIEW_WIDTH - 120;
 
     const MARGIN_TOP = 110 + AVG_IMG_LEN;
 
