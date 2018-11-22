@@ -4,18 +4,19 @@ function modelRankingVis() {
     const root = d3.select('#model-ranking-vis');
 
     const WIDTH = 1516;
-    const HEIGHT = 213;
+    const HEIGHT = 290;
 
-    const MARGIN_TOP = 50;
+    const MARGIN_TOP = 70;
     const RANKING_VIS_HEIGHT = HEIGHT - MARGIN_TOP;
     const CELL_HEIGHT = RANKING_VIS_HEIGHT / (CONSTANT.MODEL_NAMES.length);
     const BAR_HEIGHT = CELL_HEIGHT * 0.5;
     const BAR_MARGIN_TOP = CELL_HEIGHT * 0.2;
 
     const MARGIN_LEFT = CONSTANT.MARGIN_LEFT;
-    const RANKING_VIS_WIDTH = WIDTH - MARGIN_LEFT;
+    const MARGIN_RIGHT = CONSTANT.MARGIN_RIGHT;
+    const RANKING_VIS_WIDTH = WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
     const CELL_WIDTH = RANKING_VIS_WIDTH / 10;
-    const RANKING_CHANGE_LINE_LEN = 30;
+    const RANKING_CHANGE_LINE_LEN = 40;
     const BAR_WIDTH = CELL_WIDTH - RANKING_CHANGE_LINE_LEN;
 
     const TEXT_X_END = CONSTANT.MARGIN_LEFT - 100;
@@ -42,7 +43,7 @@ function modelRankingVis() {
                 .text('class-' + digit)
                 .attrs({
                     x: MARGIN_LEFT + (digit * CELL_WIDTH) + (BAR_WIDTH / 2),
-                    y: MARGIN_TOP / 2,
+                    y: MARGIN_TOP - 20,
                     'text-anchor': 'middle',
                     'alignment-baseline': 'central',
                     'fill': '#333',
@@ -66,12 +67,12 @@ function modelRankingVis() {
                 if (digit === 0) {
                     spark_y_base = MARGIN_TOP + ((ranking + 1) * CELL_HEIGHT);
                     root.append('text')
-                        .text(model_name)
+                        .text(CONSTANT.MODEL_NAMES_TO_DRWA[model_name])
                         .attrs({
-                            x: TEXT_X_END,
+                            x: TEXT_X_END - 30,
                             y: MARGIN_TOP + (ranking * CELL_HEIGHT) + (CELL_HEIGHT / 2),
-                            'text-anchor': 'end',
-                            'alignment-baseline': 'central',
+                            'text-anchor': 'start',
+                            'alignment-baseline': 'middle',
                             'fill': '#333',
                             'font-size': CONSTANT.FONT_SIZE.default,
                         })
@@ -265,9 +266,10 @@ function modelRankingVis() {
             .attrs({
                 fill: 'none',
                 stroke: CONSTANT.COLORS[model_name],
-                'stroke-width': 5,
+                'stroke-width': 3,
             })
             .classed('ranking-change-line', true)
+            .classed('selected', false)
             .classed(model_name, true)
             .on("mouseover", function () {
                 mouseOn(model_name);
@@ -316,15 +318,15 @@ function modelRankingVis() {
     }
 
     function mouseOn(model_name) {
-        d3.selectAll('.cell-background' + '.' + model_name).style("fill", CONSTANT.COLORS[model_name]);
-        d3.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", CELL_HEIGHT);
-        d3.selectAll('.spark-line' + '.' + model_name).style("stroke", "#eee");
+        root.selectAll('.cell-background' + '.' + model_name).style("fill", CONSTANT.COLORS[model_name]);
+        root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", CELL_HEIGHT);
+        root.selectAll('.spark-line' + '.' + model_name).style("stroke", "#eee");
     }
 
     function mouseOut(model_name) {
-        d3.selectAll('.cell-background' + '.' + model_name).style("fill", "#fff");
-        d3.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", "3px");
-        d3.selectAll('.spark-line' + '.' + model_name).style("stroke", CONSTANT.COLORS[model_name])
+        root.selectAll('.cell-background' + '.' + model_name).style("fill", "#fff");
+        root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", "3px");
+        root.selectAll('.spark-line' + '.' + model_name).style("stroke", CONSTANT.COLORS[model_name]);
     }
 
     function mouseDown(model_name) {

@@ -141,5 +141,26 @@ const Processor = new function () {
         return ret;
     };
 
+    this.getImgsIdx = function (condition) {
+        const c_model_name = condition.model_name;
+        const c_digit = condition.digit;
+        const c_predict = condition.predict;
+
+        let result = DATA.MODELS_PREDICTION[c_model_name];
+        result = result.slice(c_digit * 1000, c_digit * 1000 + 1000);
+
+        const idxs = [];
+
+        _.forEach(result, (r, idx) => {
+            const d = r[0];
+            const p = r[1];
+            if (d === c_digit && p === c_predict) {
+                idxs.push(idx)
+            }
+        });
+
+        return idxs;
+    };
+
     return this;
 };
