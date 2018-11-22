@@ -29,5 +29,6 @@ const CONSTANT = new function () {
         'random_forest': '#cad',
         'softmax_regression': '#9c7',
         'stacked_autoencoder': '#e9a',
+        'grid_stroke': '#bbb'
     }
 };

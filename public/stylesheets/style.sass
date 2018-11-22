@@ -29,14 +29,16 @@ html
     align-content: center
     &.model-ranking-view
       height: $ranking-vis-height - $section-margin
-      margin-bottom: $section-margin
     &.model-diagnosis-view
       height: calc(100% - #{$ranking-vis-height} - #{$section-margin})
-      margin-top: $section-margin
     &.instance-analysis-view
-      height: calc(100% - #{$section-margin})
+      height: calc(100% - 2 * #{$section-margin})
       margin-left: $section-margin
-      overflow-y: scroll
+
+.section.instance-analysis-view
+  .scroll-area
+    height: calc(100% - 364px - #{$section-margin})
+    overflow-y: scroll
 
 svg
   &#model-ranking-vis
@@ -47,8 +49,7 @@ svg
     height: 100%
   &#instance-analysis-vis
     width: 100%
-    height: 1000px
-
-image
-  -webkit-filter: invert(1)
-  filter: invert(1)
+    height: 364px
+  &#instance-analysis-vis__scroll-area
+    width: 100%
+    height: 700px

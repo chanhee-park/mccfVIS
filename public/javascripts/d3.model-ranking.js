@@ -38,17 +38,28 @@ function modelRankingVis() {
         removeAll();
 
         // 클래스의 이름을 적는다.
+        root.append('text')
+            .text("ACTUAL CLASS")
+            .attrs({
+                x: WIDTH / 2,
+                y: 15,
+                'font-size': CONSTANT.FONT_SIZE.default,
+                'fill': '#555',
+                'text-anchor': 'middle',
+                'alignment-baseline': 'hanging',
+            });
         for (let digit = 0; digit < 10; digit++) {
+            const x = MARGIN_LEFT + CELL_WIDTH * digit + BAR_WIDTH / 2;
             root.append('text')
-                .text('class-' + digit)
+                .text(digit)
                 .attrs({
-                    x: MARGIN_LEFT + (digit * CELL_WIDTH) + (BAR_WIDTH / 2),
-                    y: MARGIN_TOP - 20,
-                    'text-anchor': 'middle',
-                    'alignment-baseline': 'central',
-                    'fill': '#333',
+                    x: x,
+                    y: 45,
                     'font-size': CONSTANT.FONT_SIZE.default,
-                })
+                    'fill': '#555',
+                    'text-anchor': 'middle',
+                    'alignment-baseline': 'hanging',
+                });
         }
 
         // 각각의 모델을 순회하며 그린다.

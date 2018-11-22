@@ -6,7 +6,7 @@ function modelDiagnosisVis() {
     const WIDTH = 1516;
     const HEIGHT = 850;
 
-    const MARGIN_TOP = 65;
+    const MARGIN_TOP = 50;
     const MARGIN_BOTTOM = 20;
     const MARGIN_LEFT = CONSTANT.MARGIN_LEFT;
     const MARGIN_RIGHT = CONSTANT.MARGIN_RIGHT;
@@ -36,29 +36,6 @@ function modelDiagnosisVis() {
     drawCellArea();
 
     function drawAxis() {
-        root.append('text')
-            .text("ACTUAL CLASS")
-            .attrs({
-                x: WIDTH / 2,
-                y: 15,
-                'font-size': CONSTANT.FONT_SIZE.default,
-                'fill': '#555',
-                'text-anchor': 'middle',
-                'alignment-baseline': 'hanging',
-            });
-        for (let digit = 0; digit < 10; digit++) {
-            const x = MARGIN_LEFT + CELL_WIDTH * digit + CELL_WIDTH / 2;
-            root.append('text')
-                .text(digit)
-                .attrs({
-                    x: x,
-                    y: 45,
-                    'font-size': CONSTANT.FONT_SIZE.default,
-                    'fill': '#555',
-                    'text-anchor': 'middle',
-                    'alignment-baseline': 'hanging',
-                });
-        }
         root.append('text')
             .text("PREDICTED CLASS")
             .attrs({
@@ -99,7 +76,7 @@ function modelDiagnosisVis() {
                         width: CELL_WIDTH,
                         height: CELL_HEIGHT,
                         fill: '#fff',
-                        stroke: '#ccc'
+                        stroke: CONSTANT.COLORS.grid_stroke
                     })
                     .classed('axis', true)
                     .on("mousedown", function () {
@@ -131,7 +108,7 @@ function modelDiagnosisVis() {
         root.append('text')
             .text(txt)
             .attrs({
-                x: 10,
+                x: 20,
                 y: 10,
                 'font-size': CONSTANT.FONT_SIZE.large,
                 'font-weight': 900,
