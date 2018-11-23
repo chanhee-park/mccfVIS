@@ -34,18 +34,20 @@ function modelRankingVis() {
     let selected_model = null;
 
     const ranking_info = getRankingInfo('recall');
-    draw(ranking_info);
+    draw(ranking_info, 'recall');
 
     // toDo : 트렌지션 적용 시키면 간지쩔탱
     this.sortRanking = function (criteria) {
         criteria = criteria === 'total accuracy' ? 'name' : criteria;
         const ranking_info = getRankingInfo(criteria);
-        draw(ranking_info);
+        draw(ranking_info, criteria);
     };
 
-    function draw(ranking_info) {
+    function draw(ranking_info, criteria) {
         removeAll();
-        drawAxisInfo();
+        criteria = criteria === 'precision' ? criteria : 'recall';
+
+        drawAxisInfo(criteria);
 
         // 각각의 모델을 순회하며 그린다.
         _.forEach(CONSTANT.MODEL_NAMES, (model_name, i) => {
@@ -104,9 +106,7 @@ function modelRankingVis() {
             });
 
             // 각각의 클래스를 순회하며 그린다.
-            const spark_line_y = [];
             _.forEach(model_performance, (performance_by_class, digit) => {
-                spark_line_y.push(performance_by_class['recall']);
                 digit = parseInt(digit);
 
                 const ranking = ranking_info[digit].indexOf(model_name);
@@ -193,9 +193,9 @@ function modelRankingVis() {
             });
 
             drawRankingPath(ranking_line, model_name);
-            drawHeatMap(spark_line_y, i, model_name);
-            drawSparkLine(spark_line_y, i, model_name);
-            drawModelAccuracy(spark_line_y, i, model_name);
+            drawHeatMap(i, model_name, criteria);
+            drawSparkLine(i, model_name, criteria);
+            drawModelAccuracy(i, model_name);
 
             // add Interaction
             d3.selectAll('.' + model_name)
@@ -213,7 +213,7 @@ function modelRankingVis() {
         SortSvgObjs();
     }
 
-    function drawAxisInfo() {
+    function drawAxisInfo(criteria) {
         console.log("hi");
         // 클래스의 이름을 적는다.
         root.append('text')
@@ -227,7 +227,7 @@ function modelRankingVis() {
                 'alignment-baseline': 'hanging',
             });
         root.append('text')
-            .text("Precision Spark Line")
+            .text(criteria.toUpperCase() + " Spark Line")
             .attrs({
                 x: TEXT_X_END + SPARK_LINE_MARGIN + SPARK_LINE_INTERVAL * 5,
                 y: MARGIN_TOP - 20,
@@ -283,8 +283,13 @@ function modelRankingVis() {
             .classed(model_name, true)
     }
 
-    function drawModelAccuracy(performances_by_class, yi, model_name) {
-        const accuracy = Processor.getAvgFromJson(performances_by_class);
+    function drawModelAccuracy(yi, model_name) {
+        let sum = 0;
+        let performances = models_performance[model_name];
+        _.forEach(performances, (p) => {
+            sum += p['recall'];
+        });
+        const accuracy = sum / 10;
         const percentage = Math.round(100 * accuracy);
         const cx = TEXT_X_END + SPARK_LINE_MARGIN * 3 + SPARK_LINE_INTERVAL * 10;
         let y = yi * CELL_HEIGHT + MARGIN_TOP;
@@ -316,9 +321,11 @@ function modelRankingVis() {
             .classed(model_name, true);
     }
 
-    function drawSparkLine(scores, yi, model_name) {
+    function drawSparkLine(yi, model_name, criteria) {
         let lineData = [];
-        _.forEach(scores, (score, digit) => {
+        let performances = models_performance[model_name];
+        _.forEach(performances, (performance, digit) => {
+            const score = performance[criteria];
             const redundancy_score = getRedundancy(score, MIN_SCORE);
             const x = (digit * SPARK_LINE_INTERVAL) + (SPARK_LINE_INTERVAL / 2) + TEXT_X_END + SPARK_LINE_MARGIN;
             const y_base = (yi * CELL_HEIGHT) + MARGIN_TOP + BAR_MARGIN_TOP + BAR_HEIGHT;
@@ -342,14 +349,16 @@ function modelRankingVis() {
             .attrs({
                 fill: 'none',
                 stroke: CONSTANT.COLORS[model_name],
-                'stroke-width': SPARK_LINE_WIDTH,
+                'stroke-width': 2,
             })
             .classed('spark-line', true)
-            .classed(model_name, true)
+            .classed(model_name, true);
     }
 
-    function drawHeatMap(scores, yi, model_name) {
-        _.forEach(scores, (score, digit) => {
+    function drawHeatMap(yi, model_name, criteria) {
+        let performances = models_performance[model_name];
+        _.forEach(performances, (performance, digit) => {
+            const score = performance[criteria];
             let color = getHexColorByPerformance(score);
             const x = TEXT_X_END + SPARK_LINE_MARGIN + digit * SPARK_LINE_INTERVAL;
             const y = yi * CELL_HEIGHT + MARGIN_TOP + BAR_MARGIN_TOP;
@@ -513,5 +522,3 @@ function modelRankingVis() {
 setTimeout(function () {
     // Components.MODEL_RANKING_VIS.sortRanking('recall');
 }, 3000);
-
-

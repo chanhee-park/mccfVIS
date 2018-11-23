@@ -24,6 +24,8 @@ const CONSTANT = new function () {
         'false': '#e6194B',
         'improve': '#4363d8',
         'correct-both': '#83a3e8',
+        'recall': '#2B98F0',
+        'precision': '#50AD55',
         'worsen': '#e6194B',
         'wrong-both': '#ff699b',
         'not-focus': '#777',
