@@ -47,13 +47,13 @@ const CONSTANT = new function () {
     // 수도권 지하철 노선도 1호선 ~ 5호선 (표준)
     // ref. 서울특별시 디자인서울총괄본부. 《지하철정거장 환경디자인 가이드라인》. 서울특별시. 34p쪽
     function color_mode_2() {
-        that.COLORS['knn'] = '#0052a4';
-        that.COLORS['softmax_regression'] = '#009D3E';
-        that.COLORS['neural_network'] = '#EF7C1C';
-        that.COLORS['random_forest'] = '#00A5DE';
-        that.COLORS['stacked_autoencoder'] = '#996CAC';
+        that.COLORS['stacked_autoencoder'] = '#0052a4';
+        that.COLORS['neural_network'] = '#009D3E';
+        that.COLORS['random_forest'] = '#EF7C1C';
+        that.COLORS['softmax_regression'] = '#00A5DE';
+        that.COLORS['knn'] = '#996CAC';
     }
 
-    color_mode_1();
+    // color_mode_1();
     color_mode_2();
 };

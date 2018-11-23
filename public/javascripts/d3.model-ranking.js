@@ -4,7 +4,6 @@ function modelRankingVis() {
     const root = d3.select('#model-ranking-vis');
 
     const WIDTH = 1516;
-    // const WIDTH = 1316;
     const HEIGHT = 334;
 
     const MARGIN_TOP = 80;
@@ -20,8 +19,9 @@ function modelRankingVis() {
     const CELL_WIDTH = RANKING_VIS_WIDTH / 10;
 
     const TEXT_X_END = 50;
+
     const SPARK_LINE_MARGIN = 20;
-    const SPARK_LINE_INTERVAL = (MARGIN_LEFT - TEXT_X_END - (SPARK_LINE_MARGIN * 2) - 60) / 11;
+    const SPARK_LINE_INTERVAL = (MARGIN_LEFT - TEXT_X_END - (SPARK_LINE_MARGIN * 2) - 60) / 10;
 
     const CIRCLE_STROKE_WIDTH = 4;
     const SPARK_LINE_WIDTH = 4;

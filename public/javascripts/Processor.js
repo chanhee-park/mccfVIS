@@ -23,7 +23,7 @@ const Processor = new function () {
                 let performance_by_digit = e / 1000;
                 ret[model_name][digit] = {
                     'true': performance_by_digit,
-                    'false': 1 - performance_by_digit
+                    'false': 1 - performance_by_digit,
                 }
             });
         });

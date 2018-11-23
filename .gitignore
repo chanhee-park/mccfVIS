@@ -3,6 +3,8 @@ build
 npm-debug.log
 .env
 
+*/hide.js
+
 .DS_Store
 .idea/*
 public/data/*

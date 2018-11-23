@@ -21,6 +21,8 @@ function instanceAnalysisVis() {
 
     let imgs_idx = [];
 
+    let selected = [];
+
     drawInfo();
 
     this.drawInstanceList = function (condition) {
@@ -143,6 +145,12 @@ function instanceAnalysisVis() {
                 })
                 .on('mouseover', function () {
                     console.log(file_dir);
+                    selected.push(img_idx);
+                    console.log(selected)
+                })
+                .on('mousedown', function () {
+                    selected.pop();
+                    console.log(selected)
                 })
                 .classed("analysis_vis", true)
                 .classed("digit", true);
