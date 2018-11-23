@@ -1,4 +1,6 @@
 const CONSTANT = new function () {
+    const that = this;
+
     this.MARGIN_LEFT = 340;
     this.MARGIN_RIGHT = 30;
 
@@ -16,6 +18,7 @@ const CONSTANT = new function () {
         'knn': 'm-4',
     };
     // 참고 : https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
+    // 참고 : Categorical Colors   http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
     this.COLORS = {
         'true': '#4363d8',
         'false': '#e6194B',
@@ -30,5 +33,27 @@ const CONSTANT = new function () {
         'softmax_regression': '#9c7',
         'stacked_autoencoder': '#e9a',
         'grid_stroke': '#bbb'
+    };
+
+    // 오색 형광펜
+    function color_mode_1() {
+        that.COLORS['knn'] = '#b5fd9d';
+        that.COLORS['softmax_regression'] = '#9ce6fe';
+        that.COLORS['neural_network'] = '#fecb9c';
+        that.COLORS['random_forest'] = '#cb9cfc';
+        that.COLORS['stacked_autoencoder'] = '#fd9a9b';
     }
+
+    // 수도권 지하철 노선도 1호선 ~ 5호선 (표준)
+    // ref. 서울특별시 디자인서울총괄본부. 《지하철정거장 환경디자인 가이드라인》. 서울특별시. 34p쪽
+    function color_mode_2() {
+        that.COLORS['knn'] = '#0052a4';
+        that.COLORS['softmax_regression'] = '#009D3E';
+        that.COLORS['neural_network'] = '#EF7C1C';
+        that.COLORS['random_forest'] = '#00A5DE';
+        that.COLORS['stacked_autoencoder'] = '#996CAC';
+    }
+
+    color_mode_1();
+    color_mode_2();
 };

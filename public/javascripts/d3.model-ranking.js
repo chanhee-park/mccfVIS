@@ -24,7 +24,8 @@ function modelRankingVis() {
     const SPARK_LINE_INTERVAL = (MARGIN_LEFT - TEXT_X_END - (SPARK_LINE_MARGIN * 2) - 60) / 11;
 
     const CIRCLE_STROKE_WIDTH = 4;
-    const RANKING_STROKE_WIDTH = 7;
+    const SPARK_LINE_WIDTH = 4;
+    const RANKING_STROKE_WIDTH = 8;
 
     const MIN_SCORE = 0.5;
     const MAX_RADIUS = CELL_HEIGHT / 2;
@@ -245,7 +246,7 @@ function modelRankingVis() {
             .y(function (d) {
                 return d.y;
             })
-            .curve(d3.curveLinear); // curveLinear
+            .curve(d3.curveMonotoneX); // curveLinear
         root.append('path')
             .attr("d", lineBasis(lineData))
             .attrs({
@@ -316,7 +317,7 @@ function modelRankingVis() {
             .attrs({
                 fill: 'none',
                 stroke: CONSTANT.COLORS[model_name],
-                'stroke-width': 3,
+                'stroke-width': SPARK_LINE_WIDTH,
             })
             .classed('spark-line', true)
             .classed(model_name, true)
@@ -408,7 +409,7 @@ function modelRankingVis() {
         root.selectAll('.name-cell-background' + '.' + model_name).style("opacity", 1);
         root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", HEIGHT_RANKING_LINE_HEIGHT);
         root.selectAll('circle' + '.' + model_name).style('stroke', '#000');
-        root.selectAll('circle' + '.' + model_name).style('stroke-width', CIRCLE_STROKE_WIDTH / 2);
+        root.selectAll('circle' + '.' + model_name).style('stroke-width', CIRCLE_STROKE_WIDTH * 0.75);
     }
 
     function deHighlightModel(model_name) {
@@ -417,7 +418,6 @@ function modelRankingVis() {
         root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", RANKING_STROKE_WIDTH);
         root.selectAll('circle' + '.' + model_name).style('stroke', color);
         root.selectAll('circle' + '.' + model_name).style('stroke-width', CIRCLE_STROKE_WIDTH);
-
     }
 
     function getRadiusByPerformance(performance) {
@@ -426,8 +426,8 @@ function modelRankingVis() {
     }
 
     function getHexColorByPerformance(performance) {
-        // score 0.5 -> white (#fff) // score 1 -> black (#000)
-        let redundancy = 1 - getRedundancy(performance, MIN_SCORE);
+        // score 0.5 -> black (#000) // score 1 -> white (#fff)
+        let redundancy = getRedundancy(performance, MIN_SCORE);
 
         const color_decimal = Math.round(256 * redundancy);
         let hex = color_decimal.toString(16);
