@@ -4,7 +4,7 @@ function modelDiagnosisVis() {
     const root = d3.select('#model-diagnosis-vis');
 
     const WIDTH = 1516;
-    const HEIGHT = 774;
+    const HEIGHT = 764;
 
     const MARGIN_TOP = 10;
     const MARGIN_BOTTOM = 20;

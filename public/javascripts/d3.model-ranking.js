@@ -4,14 +4,14 @@ function modelRankingVis() {
     const root = d3.select('#model-ranking-vis');
 
     const WIDTH = 1516;
-    const HEIGHT = 334;
+    const HEIGHT = 344;
 
     const MARGIN_TOP = 80;
     const RANKING_VIS_HEIGHT = HEIGHT - MARGIN_TOP;
     const CELL_HEIGHT = RANKING_VIS_HEIGHT / (CONSTANT.MODEL_NAMES.length);
     const BAR_HEIGHT = CELL_HEIGHT * 0.6;
     const BAR_MARGIN_TOP = (CELL_HEIGHT - BAR_HEIGHT) / 2;
-    const HEIGHT_RANKING_LINE_HEIGHT = CELL_HEIGHT * 0.8;
+    const HEIGHT_RANKING_LINE_HEIGHT = CELL_HEIGHT * 0.75;
 
     const MARGIN_LEFT = CONSTANT.MARGIN_LEFT;
     const MARGIN_RIGHT = CONSTANT.MARGIN_RIGHT;
@@ -23,7 +23,7 @@ function modelRankingVis() {
     const SPARK_LINE_MARGIN = 20;
     const SPARK_LINE_INTERVAL = (MARGIN_LEFT - TEXT_X_END - (SPARK_LINE_MARGIN * 2) - 60) / 10;
 
-    const CIRCLE_STROKE_WIDTH = 4;
+    const CIRCLE_STROKE_WIDTH = 3;
     const SPARK_LINE_WIDTH = 4;
     const RANKING_STROKE_WIDTH = 8;
 
@@ -31,57 +31,21 @@ function modelRankingVis() {
     const MAX_RADIUS = CELL_HEIGHT / 2;
 
     let models_performance = Processor.getPerformances(CONSTANT.MODEL_NAMES);
-
     let selected_model = null;
 
-    this.update = function (data, criteria) {
-        models_performance = data;
-        const ranking_info = getRankingInfo(criteria);
+    const ranking_info = getRankingInfo('recall');
+    draw(ranking_info);
 
-        // toDo : 트렌지션 적용 시키면 간지쩔탱
+    // toDo : 트렌지션 적용 시키면 간지쩔탱
+    this.sortRanking = function (criteria) {
+        criteria = criteria === 'total accuracy' ? 'name' : criteria;
+        const ranking_info = getRankingInfo(criteria);
         draw(ranking_info);
     };
 
-    const ranking_info = getRankingInfo('true');
-    draw(ranking_info);
-
     function draw(ranking_info) {
         removeAll();
-
-        // 클래스의 이름을 적는다.
-        root.append('text')
-            .text("ACTUAL CLASS")
-            .attrs({
-                x: WIDTH / 2,
-                y: MARGIN_TOP - 50,
-                'font-size': CONSTANT.FONT_SIZE.default,
-                'fill': '#555',
-                'text-anchor': 'middle',
-                'alignment-baseline': 'hanging',
-            });
-        root.append('text')
-            .text("Average")
-            .attrs({
-                x: TEXT_X_END + SPARK_LINE_MARGIN * 3 + SPARK_LINE_INTERVAL * 10,
-                y: MARGIN_TOP - 25,
-                'font-size': CONSTANT.FONT_SIZE.default,
-                'fill': '#555',
-                'text-anchor': 'middle',
-                'alignment-baseline': 'hanging',
-            });
-        for (let digit = 0; digit < 10; digit++) {
-            const x = MARGIN_LEFT + CELL_WIDTH * digit + CELL_WIDTH / 2;
-            root.append('text')
-                .text(digit)
-                .attrs({
-                    x: x,
-                    y: MARGIN_TOP - 25,
-                    'font-size': CONSTANT.FONT_SIZE.default,
-                    'fill': '#555',
-                    'text-anchor': 'middle',
-                    'alignment-baseline': 'hanging',
-                });
-        }
+        drawAxisInfo();
 
         // 각각의 모델을 순회하며 그린다.
         _.forEach(CONSTANT.MODEL_NAMES, (model_name, i) => {
@@ -108,7 +72,7 @@ function modelRankingVis() {
                 .attrs({
                     x: 15,
                     y: MARGIN_TOP + (i * CELL_HEIGHT) + CELL_HEIGHT * 0.1,
-                    width: MARGIN_LEFT - 40,
+                    width: MARGIN_LEFT - 60,
                     height: HEIGHT_RANKING_LINE_HEIGHT,
                     fill: CONSTANT.COLORS[model_name],
                     opacity: 0
@@ -142,7 +106,7 @@ function modelRankingVis() {
             // 각각의 클래스를 순회하며 그린다.
             const spark_line_y = [];
             _.forEach(model_performance, (performance_by_class, digit) => {
-                spark_line_y.push(performance_by_class['true']);
+                spark_line_y.push(performance_by_class['recall']);
                 digit = parseInt(digit);
 
                 const ranking = ranking_info[digit].indexOf(model_name);
@@ -163,34 +127,46 @@ function modelRankingVis() {
                 }
 
                 // 정답률을 표현한다.
-                const performance = performance_by_class['true'];
-                const percentage = Math.round(100 * performance);
-                const r = getRadiusByPerformance(performance);
+                const recall = performance_by_class['recall'];
+                const precision = performance_by_class['precision'];
+
+                const percentage_recall = Math.round(100 * recall);
+                const percentage_precision = Math.round(100 * precision);
+
+                const r_recall = getRadiusByPerformance(recall);
+                const r_precision = getRadiusByPerformance(precision);
+
                 const cx = x + (CELL_WIDTH / 2);
                 const cy = y + (BAR_HEIGHT / 2) + BAR_MARGIN_TOP;
 
-                root.append('circle')
-                    .attrs({
-                        cx: cx,
-                        cy: cy,
-                        r: r - CIRCLE_STROKE_WIDTH / 2,
-                        fill: '#fff',
-                        stroke: CONSTANT.COLORS[model_name],
-                        'stroke-width': CIRCLE_STROKE_WIDTH,
-                        'stroke-position': 'inside',
-                    })
-                    .classed('performance-each', true)
-                    .classed(model_name, true);
                 root.append('text')
-                    .text(percentage)
+                    .text(percentage_recall)
                     .attrs({
-                        x: cx,
+                        x: cx - 2,
                         y: cy,
-                        'text-anchor': 'middle',
+                        'font-size': 12,
+                        'text-anchor': 'end',
                         'alignment-baseline': 'middle',
+                        'font-weight': 600,
                     })
                     .classed('performance-each', true)
                     .classed(model_name, true);
+
+                root.append('text')
+                    .text(percentage_precision)
+                    .attrs({
+                        x: cx + 2,
+                        y: cy,
+                        'font-size': 12,
+                        'text-anchor': 'start',
+                        'alignment-baseline': 'middle',
+                        'font-weight': 600,
+                    })
+                    .classed('performance-each', true)
+                    .classed(model_name, true);
+
+                halfcircle(cx, cy, r_recall - CIRCLE_STROKE_WIDTH / 2, model_name, 'left');
+                halfcircle(cx, cy, r_precision - CIRCLE_STROKE_WIDTH / 2, model_name, 'right');
 
                 // 순위 변경선을 그린다.
                 const next_digit = digit + 1;
@@ -219,7 +195,7 @@ function modelRankingVis() {
             drawRankingPath(ranking_line, model_name);
             drawHeatMap(spark_line_y, i, model_name);
             drawSparkLine(spark_line_y, i, model_name);
-            drawAvgPerformance(spark_line_y, i, model_name);
+            drawModelAccuracy(spark_line_y, i, model_name);
 
             // add Interaction
             d3.selectAll('.' + model_name)
@@ -235,6 +211,54 @@ function modelRankingVis() {
         });
 
         SortSvgObjs();
+    }
+
+    function drawAxisInfo() {
+        console.log("hi");
+        // 클래스의 이름을 적는다.
+        root.append('text')
+            .text("ACTUAL CLASS")
+            .attrs({
+                x: WIDTH / 2,
+                y: MARGIN_TOP - 50,
+                'font-size': CONSTANT.FONT_SIZE.default,
+                'fill': '#555',
+                'text-anchor': 'middle',
+                'alignment-baseline': 'hanging',
+            });
+        root.append('text')
+            .text("Precision Spark Line")
+            .attrs({
+                x: TEXT_X_END + SPARK_LINE_MARGIN + SPARK_LINE_INTERVAL * 5,
+                y: MARGIN_TOP - 20,
+                'font-size': CONSTANT.FONT_SIZE.default,
+                'fill': '#555',
+                'text-anchor': 'middle',
+                'alignment-baseline': 'hanging',
+            });
+        root.append('text')
+            .text("Accuracy")
+            .attrs({
+                x: TEXT_X_END + SPARK_LINE_MARGIN * 3 + SPARK_LINE_INTERVAL * 10,
+                y: MARGIN_TOP - 20,
+                'font-size': CONSTANT.FONT_SIZE.default,
+                'fill': '#555',
+                'text-anchor': 'middle',
+                'alignment-baseline': 'hanging',
+            });
+        for (let digit = 0; digit < 10; digit++) {
+            const x = MARGIN_LEFT + CELL_WIDTH * digit + CELL_WIDTH / 2;
+            root.append('text')
+                .text(digit)
+                .attrs({
+                    x: x,
+                    y: MARGIN_TOP - 20,
+                    'font-size': CONSTANT.FONT_SIZE.default,
+                    'fill': '#555',
+                    'text-anchor': 'middle',
+                    'alignment-baseline': 'hanging',
+                });
+        }
     }
 
     function drawRankingPath(lineData, model_name) {
@@ -259,13 +283,13 @@ function modelRankingVis() {
             .classed(model_name, true)
     }
 
-    function drawAvgPerformance(performances_by_class, yi, model_name) {
-        const avgPerformance = Processor.getAvgFromJson(performances_by_class);
-        const percentage = Math.round(100 * avgPerformance);
+    function drawModelAccuracy(performances_by_class, yi, model_name) {
+        const accuracy = Processor.getAvgFromJson(performances_by_class);
+        const percentage = Math.round(100 * accuracy);
         const cx = TEXT_X_END + SPARK_LINE_MARGIN * 3 + SPARK_LINE_INTERVAL * 10;
         let y = yi * CELL_HEIGHT + MARGIN_TOP;
         const cy = y + CELL_HEIGHT / 2;
-        const r = getRadiusByPerformance(avgPerformance);
+        const r = getRadiusByPerformance(accuracy);
 
         root.append('circle')
             .attrs({
@@ -276,7 +300,7 @@ function modelRankingVis() {
                 stroke: CONSTANT.COLORS[model_name],
                 'stroke-width': CIRCLE_STROKE_WIDTH,
             })
-            .classed("avg-performance", true)
+            .classed("accuracy", true)
             .classed(model_name, true);
 
         root.append('text')
@@ -286,8 +310,9 @@ function modelRankingVis() {
                 y: cy,
                 'text-anchor': 'middle',
                 'alignment-baseline': 'middle',
+                'font-weight': 600,
             })
-            .classed("avg-performance", true)
+            .classed("accuracy", true)
             .classed(model_name, true);
     }
 
@@ -351,7 +376,7 @@ function modelRankingVis() {
         root.selectAll('.performance-each').raise();
         root.selectAll('.heat-map').raise();
         root.selectAll('.spark-line').raise();
-        root.selectAll('.avg-performance').raise();
+        root.selectAll('.accuracy').raise();
         root.selectAll('text').raise();
     }
 
@@ -397,27 +422,34 @@ function modelRankingVis() {
 
     function mouseDown(model_name) {
         selected_model = model_name;
-        highlightModel(selected_model);
 
-        const prediction_changes = Processor.getPredictionChangeInfo(model_name);
-        Components.MODEL_RANKING_VIS.update(prediction_changes, 'true');
+        deHighlightAllModel();
+        highlightModel(selected_model);
         Components.MODEL_DIAGNOSIS_VIS.updateMatrix(model_name);
+        // const prediction_changes = Processor.getPredictionChangeInfo(model_name);
+        // Components.MODEL_RANKING_VIS.sortRanking('recall');
     }
 
     function highlightModel(model_name) {
         const color = CONSTANT.COLORS[model_name];
         root.selectAll('.name-cell-background' + '.' + model_name).style("opacity", 1);
         root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", HEIGHT_RANKING_LINE_HEIGHT);
-        root.selectAll('circle' + '.' + model_name).style('stroke', '#000');
-        root.selectAll('circle' + '.' + model_name).style('stroke-width', CIRCLE_STROKE_WIDTH * 0.75);
+        root.selectAll('.performance-each.performance-circle' + '.' + model_name).style('stroke', '#000');
+        root.selectAll('.performance-each.performance-circle' + '.' + model_name).style('stroke-width', CIRCLE_STROKE_WIDTH * 0.75);
     }
 
     function deHighlightModel(model_name) {
         const color = CONSTANT.COLORS[model_name];
         root.selectAll('.name-cell-background' + '.' + model_name).style("opacity", 0);
         root.selectAll('.ranking-change-line' + '.' + model_name).style("stroke-width", RANKING_STROKE_WIDTH);
-        root.selectAll('circle' + '.' + model_name).style('stroke', color);
-        root.selectAll('circle' + '.' + model_name).style('stroke-width', CIRCLE_STROKE_WIDTH);
+        root.selectAll('.performance-each.performance-circle' + '.' + model_name).style('stroke', color);
+        root.selectAll('.performance-each.performance-circle' + '.' + model_name).style('stroke-width', CIRCLE_STROKE_WIDTH);
+    }
+
+    function deHighlightAllModel() {
+        _.forEach(CONSTANT.MODEL_NAMES, (model_name) => {
+            deHighlightModel(model_name);
+        });
     }
 
     function getRadiusByPerformance(performance) {
@@ -448,6 +480,29 @@ function modelRankingVis() {
         return redundancy;
     }
 
+    function halfcircle(x, y, r, model_name, dir) {
+        let rotate = dir === 'left' ? 180 : 0;
+        let x_correction = dir === 'left' ? -1 : 1;
+
+        const arc = d3.arc();
+        return root.append('path')
+            .attr('transform', 'translate(' + [x + x_correction, y] + ') rotate(' + rotate + ') ')
+            .attr('d', arc({
+                innerRadius: 0,
+                outerRadius: r,
+                startAngle: 0,
+                endAngle: Math.PI,
+            }))
+            .attrs({
+                stroke: CONSTANT.COLORS[model_name],
+                'stroke-width': CIRCLE_STROKE_WIDTH,
+                fill: '#fff'
+            })
+            .classed('performance-each', true)
+            .classed('performance-circle', true)
+            .classed(model_name, true);
+    }
+
     function removeAll() {
         d3.selectAll('#model-ranking-vis > *').remove();
     }
@@ -456,5 +511,7 @@ function modelRankingVis() {
 }
 
 setTimeout(function () {
-    // Components.MODEL_RANKING_VIS.update(Processor.getPerformances(CONSTANT.MODEL_NAMES), 'true');
+    // Components.MODEL_RANKING_VIS.sortRanking('recall');
 }, 3000);
+
+

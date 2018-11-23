@@ -9,21 +9,30 @@ const Processor = new function () {
             const model_prediction = DATA.MODELS_PREDICTION[model_name];
 
             let num_of_correct_by_digit = _.fill(new Array(10), 0);
+            let num_of_predicts = _.fill(new Array(10), 0);
+
             _.forEach(model_prediction, (m) => {
                 const digit = m[0];
                 const predict = m[1];
-                const isCorrect = digit === predict;
+                num_of_predicts[predict] += 1;
 
-                if (isCorrect) {
+                if (digit === predict) {
                     num_of_correct_by_digit[digit] = num_of_correct_by_digit[digit] + 1
                 }
             });
 
             _.forEach(num_of_correct_by_digit, (e, digit) => {
-                let performance_by_digit = e / 1000;
+                let recall = e / 1000; // 진짜중에 진짜라고 예측한 비율
+                let precision = e / num_of_predicts[digit]; // 진짜라고 예측한것중 진짜의 비율
                 ret[model_name][digit] = {
-                    'true': performance_by_digit,
-                    'false': 1 - performance_by_digit,
+                    'recall': recall,
+                    'precision': precision,
+                    'cf': {
+                        tp: e,
+                        fn: 1000 - e,
+                        fp: num_of_predicts[digit] - e,
+                        tn: 9000 - num_of_predicts[digit] + e,
+                    }
                 }
             });
         });

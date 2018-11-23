@@ -8,6 +8,21 @@ block content
             .left
                 .section.model-ranking-view
                     svg#model-ranking-vis
+                    .dropdown
+                        a.dropdown-title
+                            .title-text Sort by recall
+                            .title-icon
+                                i.fas.fa-angle-down
+                        .submenu
+                            ul.root
+                                li
+                                    a.dropdown-item name
+                                li
+                                    a.dropdown-item total accuracy
+                                li
+                                    a.dropdown-item recall
+                                li
+                                    a.dropdown-item precision
                 .section.model-diagnosis-view
                     svg#model-diagnosis-vis
             .right
@@ -16,6 +31,7 @@ block content
                     .scroll-area
                         svg#instance-analysis-vis__scroll-area
 
+    script(type='text/javascript', src='/javascripts/dropdown.js')
     script(type='text/javascript', src='/javascripts/Constant.js')
     script(type='text/javascript', src='/javascripts/Processor.js')
     script(type='text/javascript', src='/javascripts/d3.model-ranking.js')
