@@ -234,9 +234,9 @@ function modelDiagnosisVis() {
         if (that.model_name === null) {
             return;
         }
-
         const model_name = that.model_name;
         const condition = { model_name, digit, predict };
+
         Components.INSTANCE_ANALYSIS_VIS.drawInstanceList(condition)
     }
 

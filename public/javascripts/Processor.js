@@ -170,24 +170,21 @@ const Processor = new function () {
         return idxs;
     };
 
-    this.getImproveImgs = function (condition) {
-        const imgs_idx = that.getImgsIdx(condition);
-        const c_digit = parseInt(condition.digit);
-
-        const how_many_improved = [[], [], [], [], []];
+    this.SortImgByModelPrediction = function (digit, imgs_idx, model) {
+        let ret = [];
+        const result = DATA.MODELS_PREDICTION[model];
         _.forEach(imgs_idx, (img_idx) => {
-            const prediction_idx = c_digit * 1000 + img_idx;
-            let improve_cnt = 0;
-            _.forEach(CONSTANT.MODEL_NAMES, (model_name) => {
-                const r = DATA.MODELS_PREDICTION[model_name][prediction_idx];
-                const d = parseInt(r[0]);
-                const p = parseInt(r[1]);
-                if (d === p) {
-                    improve_cnt++;
-                }
-            });
-            how_many_improved[improve_cnt].push(img_idx);
+            const pred_idx = digit * 1000 + img_idx;
+            const r = result[pred_idx];
+            const d = r[0];
+            const p = r[1];
+            if (d === p) {
+                ret.unshift(img_idx);
+            } else {
+                ret.push(img_idx);
+            }
         });
+        return ret;
     };
 
     this.getCaseSet = function (condition) {
@@ -197,8 +194,6 @@ const Processor = new function () {
         let ret = {};
         let ret_idxs = {};
 
-        let cnt1 = 0;
-        let cnt2 = 0;
         _.forEach(imgs_idx, (img_idx) => {
             const prediction_idx = c_digit * 1000 + img_idx;
             _.forEach(CONSTANT.MODEL_COMBINATIONS, (combination) => {
@@ -216,15 +211,6 @@ const Processor = new function () {
                     }
                 });
                 if (comb_true) {
-                    if (combination === '024') {
-                        console.log('024');
-                        cnt1++;
-                    }
-                    if (combination === '0') {
-                        console.log('0');
-                        cnt2++;
-                    }
-
                     if (ret.hasOwnProperty(combination)) {
                         ret[combination] += 1;
                     } else {
@@ -240,7 +226,6 @@ const Processor = new function () {
                 }
             });
         });
-        console.log(cnt1, cnt2);
         const sortable = sortObjectByValue(ret);
         const sorted_ret = [];
         _.forEach(sortable, (e) => {

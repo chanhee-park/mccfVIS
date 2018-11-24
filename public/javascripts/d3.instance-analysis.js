@@ -5,48 +5,47 @@ function instanceAnalysisVis() {
     const root_scroll_area = d3.select('#instance-analysis-vis__scroll-area');
 
     const WIDTH = 374;
-    const INFO_AREA_HEIGHT = 800;
+    const INFO_AREA_HEIGHT = 621;
     let SCROLL_AREA_HEIGHT = 300;
 
     const MARGIN_LEFT = 20;
 
     const VIEW_WIDTH = WIDTH - MARGIN_LEFT;
-    const AVG_IMG_LEN = VIEW_WIDTH - 110;
+    const AVG_IMG_LEN = VIEW_WIDTH - 90;
 
-    const MARGIN_TOP = 110 + AVG_IMG_LEN;
+    const MARGIN_TOP = 120 + AVG_IMG_LEN;
 
-    const NUM_OF_CELLS_IN_ROW = 7;
+    const NUM_OF_CELLS_IN_ROW = 6;
     const CELL_SIZE = WIDTH / NUM_OF_CELLS_IN_ROW;
     const IMG_LEN = CELL_SIZE;
 
+    const MODEL_NAME_AREA = 100;
+    const BARCODE_HEIGHT_AREA = 40;
+    const BARCODE_HEIGHT_FILL = BARCODE_HEIGHT_AREA * 0.7;
+    const MAX_BARCODE_WIDTH = WIDTH - MARGIN_LEFT - MODEL_NAME_AREA - 20;
 
-    const CASE_SET_BAR_HEIGHT_AREA = 29;
-    const CASE_SET_BAR_HEIGHT_FILL = CASE_SET_BAR_HEIGHT_AREA * 0.6;
-    const CONDITIONED_MODEL_RADIUS = CASE_SET_BAR_HEIGHT_FILL * 0.5;
-    const MAX_SET_BAR_VALUE = 100;
-    const MAX_SET_BAR_WIDTH = 180;
-
-    const SET_NAME_AREA = 30;
+    const DIGIT_VIEW_TITLE_HEIGHT = 60;
 
     let imgs_idx = [];
 
-    drawInfo();
-    drawSetGrid();
+
+    drawTitles();
+    drawBarcodeGrid();
 
     this.drawInstanceList = function (condition) {
         imgs_idx = Processor.getImgsIdx(condition);
-        SCROLL_AREA_HEIGHT = Math.ceil(imgs_idx.length / 8) * CELL_SIZE + 2;
+        SCROLL_AREA_HEIGHT = Math.ceil(imgs_idx.length / NUM_OF_CELLS_IN_ROW) * CELL_SIZE + DIGIT_VIEW_TITLE_HEIGHT;
         d3.select('#instance-analysis-vis__scroll-area').style('height', SCROLL_AREA_HEIGHT);
-        drawTitle(condition);
+        drawConditionInfo(condition);
 
         drawAvgImg(condition.model_name, condition.digit, condition.predict);
-        drawCasesSet(condition);
+        drawImproveBarcode(condition);
 
         drawDigits(condition.digit, imgs_idx);
     };
 
 
-    function drawInfo() {
+    function drawTitles() {
         root_info_area.append('text')
             .text("CONDITION")
             .attrs({
@@ -58,114 +57,190 @@ function instanceAnalysisVis() {
                 'text-anchor': 'start',
                 'alignment-baseline': 'hanging',
             });
+
+        root_info_area.append('text')
+            .text("DIGITS")
+            .attrs({
+                x: MARGIN_LEFT,
+                y: INFO_AREA_HEIGHT - DIGIT_VIEW_TITLE_HEIGHT / 2,
+                fill: '#555',
+                'text-anchor': 'start',
+                'alignment-baseline': 'hanging',
+                'font-size': CONSTANT.FONT_SIZE.default,
+                'font-weight': 900,
+            });
     }
 
-    function drawSetGrid() {
-        _.forEach(CONSTANT.MODEL_NAMES, (model_name, j) => {
-            let x = MARGIN_LEFT + j * SET_NAME_AREA + 10;
-            let y = MARGIN_TOP - 20;
-            root_info_area.append('text')
-                .text(CONSTANT.MODEL_NAMES_TO_DRWA[model_name])
-                .attrs({
-                    transform: 'translate(' + x + ',' + y + ') rotate(45) ',
-                    'font-size': CONSTANT.FONT_SIZE.default,
-                    fill: '#555',
-                    'text-anchor': 'middle',
-                    'alignment-baseline': 'ideographic',
-                })
-                .classed('grid');
+    function drawBarcodeGrid() {
+        // col 1 : model
+        let x = MARGIN_LEFT;
+        let y = MARGIN_TOP - 10;
+        root_info_area.append('text')
+            .text('Model')
+            .attrs({
+                x: x + 10,
+                y: y,
+                'font-size': CONSTANT.FONT_SIZE.default,
+                fill: '#555',
+                'text-anchor': 'middle',
+                'alignment-baseline': 'ideographic',
+            })
+            .classed('grid');
 
+        root_info_area.append('line')
+            .attrs({
+                x1: MARGIN_LEFT + 40,
+                x2: MARGIN_LEFT + 40,
+                y1: y - 20,
+                y2: INFO_AREA_HEIGHT - DIGIT_VIEW_TITLE_HEIGHT + 14,
+                stroke: '#ccc'
+            });
+
+        // col 2 : Number of Improvement Items
+        x = MARGIN_LEFT + 70;
+        y = MARGIN_TOP - 10;
+        root_info_area.append('text')
+            .text('Items')
+            .attrs({
+                x: x + 5,
+                y: y,
+                'font-size': CONSTANT.FONT_SIZE.default,
+                fill: '#555',
+                'text-anchor': 'middle',
+                'alignment-baseline': 'ideographic',
+            })
+            .classed('grid');
+
+        root_info_area.append('line')
+            .attrs({
+                x1: x + 40,
+                x2: x + 40,
+                y1: y - 20,
+                y2: INFO_AREA_HEIGHT - DIGIT_VIEW_TITLE_HEIGHT + 14,
+                stroke: '#ccc'
+            });
+
+        // col 3 : Improvement Barcode
+        x = MARGIN_LEFT + 230;
+        y = MARGIN_TOP - 10;
+        root_info_area.append('text')
+            .text('Improvement Barcode')
+            .attrs({
+                x: x + 5,
+                y: y,
+                'font-size': CONSTANT.FONT_SIZE.default,
+                fill: '#555',
+                'text-anchor': 'middle',
+                'alignment-baseline': 'ideographic',
+            })
+            .classed('grid');
+
+
+        root_info_area.append('line')
+            .attrs({
+                x1: 0,
+                x2: WIDTH,
+                y1: MARGIN_TOP - 30,
+                y2: MARGIN_TOP - 30,
+                stroke: '#ccc',
+            });
+        root_info_area.append('line')
+            .attrs({
+                x1: 0,
+                x2: WIDTH,
+                y1: y,
+                y2: y,
+                stroke: '#ccc',
+            });
+
+        _.forEach(CONSTANT.MODEL_NAMES, (model_name, row) => {
+            const bar_y = MARGIN_TOP + row * BARCODE_HEIGHT_AREA - 10;
+            let stroke_color = row === 4 ? '#333' : '#ccc';
             root_info_area.append('line')
                 .attrs({
                     x1: 0,
                     x2: WIDTH,
-                    y1: y + 15,
-                    y2: y + 15,
-                    stroke: '#ccc',
+                    y1: bar_y + BARCODE_HEIGHT_AREA,
+                    y2: bar_y + BARCODE_HEIGHT_AREA,
+                    stroke: stroke_color,
                 })
         });
     }
 
-    function drawCasesSet(condition) {
-        root_info_area.selectAll(".analysis_vis.improve-case-bar-chart").remove();
+    function drawImproveBarcode(condition, sorting_model) {
+        root_info_area.selectAll(".analysis_vis.barcode").remove();
 
-        let case_set = Processor.getCaseSet(condition);
+        let imgs_idx = Processor.getImgsIdx(condition);
+        if (sorting_model !== undefined) {
+            imgs_idx = Processor.SortImgByModelPrediction(condition.digit, imgs_idx, sorting_model);
+        }
+        const barcode_start_x = MARGIN_LEFT + MODEL_NAME_AREA + 10;
 
-        _.forEach(case_set, (e, yi) => {
-            const model_ids = e.models;
-            const number_of_items = e.number_of_items;
-
-            const cy = MARGIN_TOP + yi * CASE_SET_BAR_HEIGHT_AREA + CONDITIONED_MODEL_RADIUS;
-            // model circle line
-            root_info_area.append('line')
+        _.forEach(CONSTANT.MODEL_NAMES, (model_name, row) => {
+            const bar_y = MARGIN_TOP + row * BARCODE_HEIGHT_AREA - 10;
+            root_info_area.append('text')
+                .text(CONSTANT.MODEL_NAMES_TO_DRWA[model_name])
                 .attrs({
-                    x1: MARGIN_LEFT + CONDITIONED_MODEL_RADIUS + 10,
-                    x2: MARGIN_LEFT + 4 * SET_NAME_AREA + CONDITIONED_MODEL_RADIUS + 10,
-                    y1: cy,
-                    y2: cy,
-                    stroke: '#555',
+                    x: MARGIN_LEFT - 7,
+                    y: bar_y + BARCODE_HEIGHT_AREA / 2,
+                    'text-anchor': 'start',
+                    'alignment-baseline': 'start',
+                    fill: '#333'
                 })
                 .classed('analysis_vis', true)
-                .classed('improve-case-bar-chart', true);
+                .classed("barcode", true)
+                .on('mousedown', function () {
+                    drawImproveBarcode(condition, model_name)
+                });
+        });
 
-            // draw set circle
-            for (let i = 0; i < 5; i++) {
-                const model_name = CONSTANT.MODEL_NAMES[i];
-                const model_color = CONSTANT.COLORS[model_name];
+        let number_of_items = [0, 0, 0, 0, 0];
+        _.forEach(imgs_idx, (img_idx, col) => {
+            const bar_x = barcode_start_x + col * (MAX_BARCODE_WIDTH / imgs_idx.length);
+            _.forEach(CONSTANT.MODEL_NAMES, (model_name, row) => {
+                const bar_y = MARGIN_TOP - 10 + row * BARCODE_HEIGHT_AREA + (BARCODE_HEIGHT_AREA - BARCODE_HEIGHT_FILL) / 2;
+                const r = DATA.MODELS_PREDICTION[model_name][condition.digit * 1000 + img_idx];
+                const d = r[0];
+                const p = r[1];
+                if (d === p) {
+                    number_of_items[row]++;
+                    root_info_area.append('rect')
+                        .attrs({
+                            x: bar_x,
+                            y: bar_y,
+                            width: MAX_BARCODE_WIDTH / imgs_idx.length,
+                            height: BARCODE_HEIGHT_FILL,
+                            fill: CONSTANT.COLORS['improve']
+                        })
+                        .classed('analysis_vis', true)
+                        .classed("barcode", true);
+                }
+            });
+        });
 
-                const r = model_ids.indexOf(i) >= 0 ? CONDITIONED_MODEL_RADIUS : 3;
-                const c = model_ids.indexOf(i) >= 0 ? model_color : '#555';
-                const cx = MARGIN_LEFT + i * SET_NAME_AREA + CONDITIONED_MODEL_RADIUS + 10;
-                // model circle
-                root_info_area.append('circle')
-                    .attrs({
-                        cx: cx,
-                        cy: cy,
-                        r: r,
-                        fill: c
-                    })
-                    .classed('analysis_vis', true)
-                    .classed('improve-case-bar-chart', true);
-            }
-
-            // draw bar
-            const x = MARGIN_LEFT + 5 * SET_NAME_AREA + 20;
-            const y = MARGIN_TOP + yi * CASE_SET_BAR_HEIGHT_AREA;
-            const width = (number_of_items / MAX_SET_BAR_VALUE) * MAX_SET_BAR_WIDTH;
-            root_info_area.append('rect')
+        _.forEach(number_of_items, (e, yi) => {
+            const bar_y = MARGIN_TOP + yi * BARCODE_HEIGHT_AREA + (BARCODE_HEIGHT_AREA - BARCODE_HEIGHT_FILL) / 2;
+            root_info_area.append('text')
+                .text(e)
                 .attrs({
-                    x: x,
-                    y: y,
-                    width: width,
-                    height: CASE_SET_BAR_HEIGHT_FILL,
-                    fill: CONSTANT.COLORS['improve']
+                    x: MARGIN_LEFT + 60,
+                    y: bar_y,
+                    'font-size': CONSTANT.FONT_SIZE.default,
+                    'text-anchor': 'center',
+                    'alignment-baseline': 'middle',
+                    'fill': '#333'
                 })
                 .classed('analysis_vis', true)
-                .classed('improve-case-bar-chart', true)
-                .on('mousedown',function () {
-                    drawDigits(condition.digit, e.imgs_idx);
-                });
-
-            // 가로 그리드
-            root_info_area.append('line')
-                .attrs({
-                    x1: 0,
-                    x2: WIDTH,
-                    y1: y - (CASE_SET_BAR_HEIGHT_AREA - CASE_SET_BAR_HEIGHT_FILL) / 2,
-                    y2: y - (CASE_SET_BAR_HEIGHT_AREA - CASE_SET_BAR_HEIGHT_FILL) / 2,
-                    stroke: '#ccc'
-                });
-
-
-
-        })
+                .classed("barcode", true);
+        });
     }
 
-    function drawTitle(condition) {
+    function drawConditionInfo(condition) {
         root_info_area.selectAll(".analysis_vis.title").remove();
         const title = CONSTANT.MODEL_NAMES_TO_DRWA[condition.model_name]
             + "  | Digit : " + condition.digit
-            + "  | Predict : " + condition.predict;
+            + "  | Predict : " + condition.predict
+            + "  | " + Processor.getImgsIdx(condition).length + " Items";
 
         root_info_area.append('text')
             .text(title)
@@ -202,9 +277,7 @@ function instanceAnalysisVis() {
 
     function drawDigits(digit, imgs_idx) {
         root_scroll_area.selectAll(".analysis_vis.digit").remove();
-
         let col = 0;
-
         _.forEach(imgs_idx, (img_idx, i) => {
             const row = i % NUM_OF_CELLS_IN_ROW;
 
@@ -212,10 +285,10 @@ function instanceAnalysisVis() {
             root_scroll_area.append('image')
                 .attrs({
                     "xlink:href": file_dir,
-                    x: CELL_SIZE * row + 1,
-                    y: CELL_SIZE * col + 1,
-                    width: IMG_LEN - 2,
-                    height: IMG_LEN - 2,
+                    x: CELL_SIZE * row + 2,
+                    y: CELL_SIZE * col + 2,
+                    width: IMG_LEN - 4,
+                    height: IMG_LEN - 4,
                 })
                 .classed("analysis_vis", true)
                 .classed("digit", true);

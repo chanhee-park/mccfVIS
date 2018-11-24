@@ -51,7 +51,7 @@ html {
 
 .section.instance-analysis-view .scroll-area {
   margin-top: -6px;
-  height: calc(100% - 796px - 6px);
+  height: calc(100% - 620px - 6px);
   overflow-y: scroll; }
 
 svg#model-ranking-vis {
@@ -64,11 +64,10 @@ svg#model-diagnosis-vis {
 
 svg#instance-analysis-vis {
   width: 100%;
-  height: 796px;
-  border-bottom: 2px solid #bbb; }
+  height: 620px; }
 
 svg#instance-analysis-vis__scroll-area {
   width: 100%;
-  height: calc(100% - 796px); }
+  height: 200px; }
 
 /*# sourceMappingURL=style.css.map */
