@@ -1,5 +1,5 @@
 const Processor = new function () {
-
+    let that = this;
     this.getPerformances = function (model_names) {
         let ret = {};
 
@@ -152,12 +152,11 @@ const Processor = new function () {
 
     this.getImgsIdx = function (condition) {
         const c_model_name = condition.model_name;
-        const c_digit = condition.digit;
-        const c_predict = condition.predict;
+        const c_digit = parseInt(condition.digit);
+        const c_predict = parseInt(condition.predict);
 
         let result = DATA.MODELS_PREDICTION[c_model_name];
         result = result.slice(c_digit * 1000, c_digit * 1000 + 1000);
-
         const idxs = [];
 
         _.forEach(result, (r, idx) => {
@@ -171,6 +170,89 @@ const Processor = new function () {
         return idxs;
     };
 
+    this.getImproveImgs = function (condition) {
+        const imgs_idx = that.getImgsIdx(condition);
+        const c_digit = parseInt(condition.digit);
+
+        const how_many_improved = [[], [], [], [], []];
+        _.forEach(imgs_idx, (img_idx) => {
+            const prediction_idx = c_digit * 1000 + img_idx;
+            let improve_cnt = 0;
+            _.forEach(CONSTANT.MODEL_NAMES, (model_name) => {
+                const r = DATA.MODELS_PREDICTION[model_name][prediction_idx];
+                const d = parseInt(r[0]);
+                const p = parseInt(r[1]);
+                if (d === p) {
+                    improve_cnt++;
+                }
+            });
+            how_many_improved[improve_cnt].push(img_idx);
+        });
+    };
+
+    this.getCaseSet = function (condition) {
+        const imgs_idx = that.getImgsIdx(condition);
+        const c_digit = parseInt(condition.digit);
+
+        let ret = {};
+        let ret_idxs = {};
+
+        let cnt1 = 0;
+        let cnt2 = 0;
+        _.forEach(imgs_idx, (img_idx) => {
+            const prediction_idx = c_digit * 1000 + img_idx;
+            _.forEach(CONSTANT.MODEL_COMBINATIONS, (combination) => {
+                let comb_true = true;
+                if (combination.length <= 0) {
+                    comb_true = false;
+                }
+                _.forEach(combination, (model_idx) => {
+                    const model_name = CONSTANT.MODEL_NAMES[model_idx];
+                    const r = DATA.MODELS_PREDICTION[model_name][prediction_idx];
+                    const d = parseInt(r[0]);
+                    const p = parseInt(r[1]);
+                    if (d !== p) {
+                        comb_true = false;
+                    }
+                });
+                if (comb_true) {
+                    if (combination === '024') {
+                        console.log('024');
+                        cnt1++;
+                    }
+                    if (combination === '0') {
+                        console.log('0');
+                        cnt2++;
+                    }
+
+                    if (ret.hasOwnProperty(combination)) {
+                        ret[combination] += 1;
+                    } else {
+                        ret[combination] = 1;
+                    }
+
+                    if (ret_idxs.hasOwnProperty(combination)) {
+                        ret_idxs[combination].push(img_idx)
+                    } else {
+                        ret_idxs[combination] = [img_idx];
+                    }
+
+                }
+            });
+        });
+        console.log(cnt1, cnt2);
+        const sortable = sortObjectByValue(ret);
+        const sorted_ret = [];
+        _.forEach(sortable, (e) => {
+            const models = [];
+            _.forEach(e[0], (model_idx) => {
+                models.push(parseInt(model_idx));
+            });
+            sorted_ret.push({ models: models, number_of_items: e[1], imgs_idx: ret_idxs[e[0]] })
+        });
+        return sorted_ret;
+    };
+
     this.getAvgFromJson = function (json) {
         let values = _.values(json);
         return _.mean(values);
@@ -178,3 +260,16 @@ const Processor = new function () {
 
     return this;
 };
+
+
+function sortObjectByValue(obj) {
+    let sortable = [];
+    _.forEach(obj, (num_of_item, case_id) => {
+        sortable.push([case_id, obj[case_id]]);
+    });
+    sortable.sort(function (a, b) {
+        return b[1] - a[1];
+    });
+    return sortable;
+}
+

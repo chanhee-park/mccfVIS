@@ -242,3 +242,9 @@ function modelDiagnosisVis() {
 
     return that;
 }
+
+// setTimeout(function () {
+//     Components.INSTANCE_ANALYSIS_VIS.drawInstanceList(
+//         { 'model_name': 'knn', 'digit': 4, 'predict': 9 }
+//     );
+// }, 500);

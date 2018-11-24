@@ -214,7 +214,6 @@ function modelRankingVis() {
     }
 
     function drawAxisInfo(criteria) {
-        console.log("hi");
         // 클래스의 이름을 적는다.
         root.append('text')
             .text("ACTUAL CLASS")
@@ -518,7 +517,7 @@ function modelRankingVis() {
 
     return that;
 }
-
-setTimeout(function () {
-    // Components.MODEL_RANKING_VIS.sortRanking('recall');
-}, 3000);
+//
+// setTimeout(function () {
+//     Components.MODEL_DIAGNOSIS_VIS.updateMatrix('knn');
+// }, 750);

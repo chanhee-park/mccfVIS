@@ -5,33 +5,43 @@ function instanceAnalysisVis() {
     const root_scroll_area = d3.select('#instance-analysis-vis__scroll-area');
 
     const WIDTH = 374;
-    const INFO_AREA_HEIGHT = 334;
-    let SCROLL_AREA_HEIGHT = 1000;
+    const INFO_AREA_HEIGHT = 800;
+    let SCROLL_AREA_HEIGHT = 300;
 
     const MARGIN_LEFT = 20;
 
     const VIEW_WIDTH = WIDTH - MARGIN_LEFT;
-    const AVG_IMG_LEN = VIEW_WIDTH - 120;
+    const AVG_IMG_LEN = VIEW_WIDTH - 110;
 
     const MARGIN_TOP = 110 + AVG_IMG_LEN;
 
-    const CELL_SIZE = WIDTH / 6;
+    const NUM_OF_CELLS_IN_ROW = 7;
+    const CELL_SIZE = WIDTH / NUM_OF_CELLS_IN_ROW;
     const IMG_LEN = CELL_SIZE;
-    const CIRCLE_RADIUS = IMG_LEN * 0.1;
+
+
+    const CASE_SET_BAR_HEIGHT_AREA = 29;
+    const CASE_SET_BAR_HEIGHT_FILL = CASE_SET_BAR_HEIGHT_AREA * 0.6;
+    const CONDITIONED_MODEL_RADIUS = CASE_SET_BAR_HEIGHT_FILL * 0.5;
+    const MAX_SET_BAR_VALUE = 100;
+    const MAX_SET_BAR_WIDTH = 180;
+
+    const SET_NAME_AREA = 30;
 
     let imgs_idx = [];
 
-    let selected = [];
-
     drawInfo();
+    drawSetGrid();
 
     this.drawInstanceList = function (condition) {
         imgs_idx = Processor.getImgsIdx(condition);
-        SCROLL_AREA_HEIGHT = imgs_idx.length * CELL_SIZE + 2;
+        SCROLL_AREA_HEIGHT = Math.ceil(imgs_idx.length / 8) * CELL_SIZE + 2;
         d3.select('#instance-analysis-vis__scroll-area').style('height', SCROLL_AREA_HEIGHT);
         drawTitle(condition);
+
         drawAvgImg(condition.model_name, condition.digit, condition.predict);
-        drawADigitGrid(imgs_idx.length);
+        drawCasesSet(condition);
+
         drawDigits(condition.digit, imgs_idx);
     };
 
@@ -48,19 +58,107 @@ function instanceAnalysisVis() {
                 'text-anchor': 'start',
                 'alignment-baseline': 'hanging',
             });
+    }
 
+    function drawSetGrid() {
         _.forEach(CONSTANT.MODEL_NAMES, (model_name, j) => {
+            let x = MARGIN_LEFT + j * SET_NAME_AREA + 10;
+            let y = MARGIN_TOP - 20;
             root_info_area.append('text')
                 .text(CONSTANT.MODEL_NAMES_TO_DRWA[model_name])
                 .attrs({
-                    x: MARGIN_LEFT + CELL_SIZE + j * CELL_SIZE + 15,
-                    y: MARGIN_TOP - 20,
+                    transform: 'translate(' + x + ',' + y + ') rotate(45) ',
                     'font-size': CONSTANT.FONT_SIZE.default,
                     fill: '#555',
                     'text-anchor': 'middle',
-                    'alignment-baseline': 'middle',
+                    'alignment-baseline': 'ideographic',
+                })
+                .classed('grid');
+
+            root_info_area.append('line')
+                .attrs({
+                    x1: 0,
+                    x2: WIDTH,
+                    y1: y + 15,
+                    y2: y + 15,
+                    stroke: '#ccc',
                 })
         });
+    }
+
+    function drawCasesSet(condition) {
+        root_info_area.selectAll(".analysis_vis.improve-case-bar-chart").remove();
+
+        let case_set = Processor.getCaseSet(condition);
+
+        _.forEach(case_set, (e, yi) => {
+            const model_ids = e.models;
+            const number_of_items = e.number_of_items;
+
+            const cy = MARGIN_TOP + yi * CASE_SET_BAR_HEIGHT_AREA + CONDITIONED_MODEL_RADIUS;
+            // model circle line
+            root_info_area.append('line')
+                .attrs({
+                    x1: MARGIN_LEFT + CONDITIONED_MODEL_RADIUS + 10,
+                    x2: MARGIN_LEFT + 4 * SET_NAME_AREA + CONDITIONED_MODEL_RADIUS + 10,
+                    y1: cy,
+                    y2: cy,
+                    stroke: '#555',
+                })
+                .classed('analysis_vis', true)
+                .classed('improve-case-bar-chart', true);
+
+            // draw set circle
+            for (let i = 0; i < 5; i++) {
+                const model_name = CONSTANT.MODEL_NAMES[i];
+                const model_color = CONSTANT.COLORS[model_name];
+
+                const r = model_ids.indexOf(i) >= 0 ? CONDITIONED_MODEL_RADIUS : 3;
+                const c = model_ids.indexOf(i) >= 0 ? model_color : '#555';
+                const cx = MARGIN_LEFT + i * SET_NAME_AREA + CONDITIONED_MODEL_RADIUS + 10;
+                // model circle
+                root_info_area.append('circle')
+                    .attrs({
+                        cx: cx,
+                        cy: cy,
+                        r: r,
+                        fill: c
+                    })
+                    .classed('analysis_vis', true)
+                    .classed('improve-case-bar-chart', true);
+            }
+
+            // draw bar
+            const x = MARGIN_LEFT + 5 * SET_NAME_AREA + 20;
+            const y = MARGIN_TOP + yi * CASE_SET_BAR_HEIGHT_AREA;
+            const width = (number_of_items / MAX_SET_BAR_VALUE) * MAX_SET_BAR_WIDTH;
+            root_info_area.append('rect')
+                .attrs({
+                    x: x,
+                    y: y,
+                    width: width,
+                    height: CASE_SET_BAR_HEIGHT_FILL,
+                    fill: CONSTANT.COLORS['improve']
+                })
+                .classed('analysis_vis', true)
+                .classed('improve-case-bar-chart', true)
+                .on('mousedown',function () {
+                    drawDigits(condition.digit, e.imgs_idx);
+                });
+
+            // 가로 그리드
+            root_info_area.append('line')
+                .attrs({
+                    x1: 0,
+                    x2: WIDTH,
+                    y1: y - (CASE_SET_BAR_HEIGHT_AREA - CASE_SET_BAR_HEIGHT_FILL) / 2,
+                    y2: y - (CASE_SET_BAR_HEIGHT_AREA - CASE_SET_BAR_HEIGHT_FILL) / 2,
+                    stroke: '#ccc'
+                });
+
+
+
+        })
     }
 
     function drawTitle(condition) {
@@ -102,73 +200,29 @@ function instanceAnalysisVis() {
             .classed('avg_img', true);
     }
 
-    function drawADigitGrid(num_of_instances) {
-        // 세로 줄
-        for (let i = 1; i < CONSTANT['MODEL_NAMES'].length + 1; i++) {
-            root_scroll_area.append('line')
-                .attrs({
-                    x1: CELL_SIZE * i,
-                    x2: CELL_SIZE * i,
-                    y1: 0,
-                    y2: SCROLL_AREA_HEIGHT,
-                    stroke: CONSTANT.COLORS.grid_stroke,
-                    'stroke-width': 2
-                })
-        }
-
-        // 가로 줄
-        for (let i = 0; i <= num_of_instances + 1; i++) {
-            root_scroll_area.append('line')
-                .attrs({
-                    x1: 0,
-                    x2: WIDTH,
-                    y1: CELL_SIZE * i,
-                    y2: CELL_SIZE * i,
-                    stroke: CONSTANT.COLORS.grid_stroke
-
-                })
-        }
-    }
-
     function drawDigits(digit, imgs_idx) {
         root_scroll_area.selectAll(".analysis_vis.digit").remove();
 
+        let col = 0;
+
         _.forEach(imgs_idx, (img_idx, i) => {
+            const row = i % NUM_OF_CELLS_IN_ROW;
+
             const file_dir = "./data/mnist_png_testing/" + digit + "/" + digit + "_" + (img_idx + 1) + ".png";
             root_scroll_area.append('image')
                 .attrs({
                     "xlink:href": file_dir,
-                    x: 0,
-                    y: CELL_SIZE * i,
-                    width: IMG_LEN,
-                    height: IMG_LEN,
-                })
-                .on('mouseover', function () {
-                    console.log(file_dir);
-                    selected.push(img_idx);
-                    console.log(selected)
-                })
-                .on('mousedown', function () {
-                    selected.pop();
-                    console.log(selected)
+                    x: CELL_SIZE * row + 1,
+                    y: CELL_SIZE * col + 1,
+                    width: IMG_LEN - 2,
+                    height: IMG_LEN - 2,
                 })
                 .classed("analysis_vis", true)
                 .classed("digit", true);
 
-            _.forEach(CONSTANT.MODEL_NAMES, (model_name, j) => {
-                const cur_m_predict = DATA.MODELS_PREDICTION[model_name][digit * 1000 + img_idx][1];
-                const color = cur_m_predict === digit ? CONSTANT.COLORS['improve'] : CONSTANT.COLORS['wrong-both'];
-
-                root_scroll_area.append('circle')
-                    .attrs({
-                        cx: CELL_SIZE + CELL_SIZE * j + CELL_SIZE / 2,
-                        cy: CELL_SIZE * i + CELL_SIZE / 2,
-                        r: CIRCLE_RADIUS,
-                        fill: color
-                    })
-                    .classed("analysis_vis", true)
-                    .classed("digit", true);
-            })
+            if ((i + 1) % NUM_OF_CELLS_IN_ROW === 0) {
+                col += 1;
+            }
         });
     }
 

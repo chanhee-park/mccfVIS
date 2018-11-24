@@ -17,12 +17,14 @@ const CONSTANT = new function () {
         'softmax_regression': 'm-3',
         'knn': 'm-4',
     };
+
     // 참고 : https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
     // 참고 : Categorical Colors   http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
     this.COLORS = {
         'true': '#4363d8',
         'false': '#e6194B',
-        'improve': '#4363d8',
+        // 'improve': '#4363d8',
+        'improve': '#a2a2c3',
         'correct-both': '#83a3e8',
         'recall': '#2B98F0',
         'precision': '#50AD55',
@@ -34,7 +36,7 @@ const CONSTANT = new function () {
         'random_forest': '#cad',
         'softmax_regression': '#9c7',
         'stacked_autoencoder': '#e9a',
-        'grid_stroke': '#bbb'
+        'grid_stroke': '#bbb',
     };
 
     // 오색 형광펜
@@ -58,4 +60,26 @@ const CONSTANT = new function () {
 
     // color_mode_1();
     color_mode_2();
+
+    this.MODEL_COMBINATIONS = [
+        '',
+
+        '0', '1', '2', '3', '4',
+
+        '01', '02', '03', '04',
+        '12', '13', '14',
+        '23', '24',
+        '34',
+
+        '012', '013', '014',
+        '023', '024', '024',
+        '034',
+        '123', '124',
+        '134',
+        '234',
+
+        '0123', '0124', '0134', '0234', '1234',
+
+        '01234'
+    ];
 };
