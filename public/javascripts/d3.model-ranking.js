@@ -23,7 +23,7 @@ function modelRankingVis() {
     const SPARK_LINE_MARGIN = 20;
     const SPARK_LINE_INTERVAL = (MARGIN_LEFT - TEXT_X_END - (SPARK_LINE_MARGIN * 2) - 60) / 10;
 
-    const CIRCLE_STROKE_WIDTH = 3;
+    const CIRCLE_STROKE_WIDTH = 2;    //**CHANGED**//
     const SPARK_LINE_WIDTH = 4;
     const RANKING_STROKE_WIDTH = 8;
 
@@ -36,7 +36,7 @@ function modelRankingVis() {
     const ranking_info = getRankingInfo('recall');
     draw(ranking_info, 'recall');
 
-    // toDo : 트렌지션 적용 시키면 간지쩔탱
+    // TODO : 트렌지션 적용 시키면 간지쩔탱
     this.sortRanking = function (criteria) {
         criteria = criteria === 'total accuracy' ? 'name' : criteria;
         const ranking_info = getRankingInfo(criteria);
@@ -165,8 +165,8 @@ function modelRankingVis() {
                     .classed('performance-each', true)
                     .classed(model_name, true);
 
-                halfcircle(cx, cy, r_recall - CIRCLE_STROKE_WIDTH / 2, model_name, 'left');
-                halfcircle(cx, cy, r_precision - CIRCLE_STROKE_WIDTH / 2, model_name, 'right');
+                halfcircle(cx + CIRCLE_STROKE_WIDTH/2, cy, r_recall - CIRCLE_STROKE_WIDTH / 2, model_name, 'left');
+                halfcircle(cx - CIRCLE_STROKE_WIDTH/2, cy, r_precision - CIRCLE_STROKE_WIDTH / 2, model_name, 'right');
 
                 // 순위 변경선을 그린다.
                 const next_digit = digit + 1;
@@ -492,6 +492,7 @@ function modelRankingVis() {
         let rotate = dir === 'left' ? 180 : 0;
         let x_correction = dir === 'left' ? -1 : 1;
 
+        let color_code = dir === 'left' ? CONSTANT.COLORS[model_name] : '#fff';
         const arc = d3.arc();
         return root.append('path')
             .attr('transform', 'translate(' + [x + x_correction, y] + ') rotate(' + rotate + ') ')
@@ -504,7 +505,7 @@ function modelRankingVis() {
             .attrs({
                 stroke: CONSTANT.COLORS[model_name],
                 'stroke-width': CIRCLE_STROKE_WIDTH,
-                fill: '#fff'
+                fill: color_code
             })
             .classed('performance-each', true)
             .classed('performance-circle', true)
