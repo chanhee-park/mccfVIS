@@ -20,7 +20,7 @@ function modelDiagnosisVis() {
     const CELL_WIDTH = MATRIX_WIDTH / 10;
     const CELL_HEIGHT = MATRIX_HEIGHT / 10;
 
-    const MAX_VAL_BAR = 280;
+    const MAX_VAL_BAR = 270;
     const MAX_VAL = 103;
 
     const BAR_INTERVAL = (CELL_WIDTH - CELL_HEIGHT) / 4;
@@ -130,18 +130,29 @@ function modelDiagnosisVis() {
     function drawEachSummationCell(predict, num_of_err, improve_info) {
         let i = 0;
         let err_y = num_of_err * CELL_HEIGHT / MAX_VAL_BAR;
-        root.append('line')
-            .attrs({
-                x1: SUMMATION_CELL_START,
-                x2: SUMMATION_CELL_START + SUMMATION_CELL_WIDTH,
-                y1: MARGIN_TOP + (CELL_HEIGHT * predict) + CELL_HEIGHT - err_y,
-                y2: MARGIN_TOP + (CELL_HEIGHT * predict) + CELL_HEIGHT - err_y,
-                stroke: '#333',
-                'stroke-width': 3
-            })
-            .classed('matrix', true);
+        // root.append('line')
+        //     .attrs({
+        //         x1: SUMMATION_CELL_START,
+        //         x2: SUMMATION_CELL_START + SUMMATION_CELL_WIDTH,
+        //         y1: MARGIN_TOP + (CELL_HEIGHT * predict) + CELL_HEIGHT - err_y,
+        //         y2: MARGIN_TOP + (CELL_HEIGHT * predict) + CELL_HEIGHT - err_y,
+        //         stroke: '#333',
+        //         'stroke-width': 3
+        //     })
+        //     .classed('matrix', true);
 
         _.forEach(improve_info, (improvement, model_name) => {
+            root.append('rect')
+                .attrs({
+                    x: SUMMATION_CELL_START + i * BAR_INTERVAL + 17,
+                    y: MARGIN_TOP + (CELL_HEIGHT * predict) + CELL_HEIGHT - err_y,
+                    width: BAR_INTERVAL * 4 / 5,
+                    height: err_y,
+                    stroke: '#999',
+                    fill: '#fff',
+                    'stroke-width': 1,
+                })
+                .classed('matrix', true);
             let y = improvement * CELL_HEIGHT / MAX_VAL_BAR;
             root.append('rect')
                 .attrs({
@@ -200,19 +211,21 @@ function modelDiagnosisVis() {
         const data = that.improveInfo[digit][predict];
 
         let err_y = num_of_err * CELL_HEIGHT / MAX_VAL_BAR;
-        // root.append('line')
-        //     .attrs({
-        //         x1: cell_x,
-        //         x2: cell_x + CELL_WIDTH,
-        //         y1: MARGIN_TOP + (CELL_HEIGHT * predict) + CELL_HEIGHT - err_y,
-        //         y2: MARGIN_TOP + (CELL_HEIGHT * predict) + CELL_HEIGHT - err_y,
-        //         stroke: '#333',
-        //         'stroke-width': 1,
-        //     })
-        //     .classed('matrix', true);
 
         let i = 0;
         _.forEach(data, (improvement, model_name) => {
+            root.append('rect')
+                .attrs({
+                    x: cell_x + CELL_HEIGHT + i * BAR_INTERVAL - 3,
+                    y: cell_y + CELL_HEIGHT - err_y,
+                    width: BAR_INTERVAL * 4 / 5,
+                    height: err_y,
+                    stroke: '#999',
+                    fill: '#fff',
+                    'stroke-width': 1,
+                })
+                .classed('matrix', true);
+
             let y = improvement * CELL_HEIGHT / MAX_VAL_BAR;
             root.append('rect')
                 .attrs({

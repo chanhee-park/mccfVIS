@@ -60,7 +60,7 @@ const CONSTANT = new function () {
 
     //5 color rainbow scheme
     function color_mode_3() {
-        that.COLORS['stacked_autoencoder'] = '#442288';
+        that.COLORS['stacked_autoencoder'] = '#996CAC';
         that.COLORS['neural_network'] = '#6ca2ea';
         that.COLORS['random_forest'] = '#b5d33d';
         that.COLORS['softmax_regression'] = '#fed23f';

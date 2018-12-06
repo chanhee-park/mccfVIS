@@ -27,7 +27,7 @@ function modelRankingVis() {
     const SPARK_LINE_WIDTH = 4;
     const RANKING_STROKE_WIDTH = 8;
 
-    const MIN_SCORE = 0.5;
+    const MIN_SCORE = 0.65;
     const MAX_RADIUS = CELL_HEIGHT / 2;
 
     let models_performance = Processor.getPerformances(CONSTANT.MODEL_NAMES);
@@ -165,8 +165,8 @@ function modelRankingVis() {
                     .classed('performance-each', true)
                     .classed(model_name, true);
 
-                halfcircle(cx + CIRCLE_STROKE_WIDTH/2, cy, r_recall - CIRCLE_STROKE_WIDTH / 2, model_name, 'left');
-                halfcircle(cx - CIRCLE_STROKE_WIDTH/2, cy, r_precision - CIRCLE_STROKE_WIDTH / 2, model_name, 'right');
+                halfcircle(cx + CIRCLE_STROKE_WIDTH / 2, cy, r_recall - CIRCLE_STROKE_WIDTH / 2, model_name, 'left');
+                halfcircle(cx - CIRCLE_STROKE_WIDTH / 2, cy, r_precision - CIRCLE_STROKE_WIDTH / 2, model_name, 'right');
 
                 // 순위 변경선을 그린다.
                 const next_digit = digit + 1;
@@ -461,7 +461,12 @@ function modelRankingVis() {
     }
 
     function getRadiusByPerformance(performance) {
-        const redundancy = getRedundancy(performance, MIN_SCORE);
+        let redundancy = getRedundancy(performance, MIN_SCORE);  // 0 ~ 1
+        // console.log('r', redundancy);
+        // redundancy = Math.sqrt(redundancy);
+        // redundancy = redundancy+ Math.log(redundancy);
+        // console.log('s', redundancy);
+        console.log();
         return redundancy * MAX_RADIUS;
     }
 
@@ -518,6 +523,7 @@ function modelRankingVis() {
 
     return that;
 }
+
 //
 // setTimeout(function () {
 //     Components.MODEL_DIAGNOSIS_VIS.updateMatrix('knn');

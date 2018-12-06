@@ -275,6 +275,8 @@ function instanceAnalysisVis() {
             .classed('avg_img', true);
     }
 
+    this.selected = [];
+
     function drawDigits(digit, imgs_idx) {
         root_scroll_area.selectAll(".analysis_vis.digit").remove();
         let col = 0;
@@ -290,6 +292,11 @@ function instanceAnalysisVis() {
                     width: IMG_LEN - 4,
                     height: IMG_LEN - 4,
                 })
+                .on('mousedown',
+                    function () {
+                        that.selected.push(1000 * digit + img_idx);
+                        console.log(that.selected);
+                    })
                 .classed("analysis_vis", true)
                 .classed("digit", true);
 
